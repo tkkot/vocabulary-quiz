@@ -2,28 +2,56 @@ from numpy import random
 import numpy as np
 import os
 
-class Set:
+
+class Entry:
+    line = -1
+    key = ""
+    ans = []
+
+class SourceFile:
     lines=[]
-    words=[]
     
     def __init__(self, path):
         try:
             file = open(path, mode='rt', encoding = 'utf-8')
             lines=file.read().splitlines()
-            for i in lines:
-                if i.startswith('#'):
-                    continue
-                line = i.split(';')
-                if len(line)!=2:
-                    continue
-
-                w=[]
-                for j in line[0].split(','):
-                    w.append(j.strip())
-            
-                self.words.append((w, line[1].strip()))
+           
         finally:
             file.close()
+
+    def read():
+        sets = []
+        curSet = Set("default")
+        for ix, i in enumerate(lines):
+            if i.strip().startswith('#'):
+                continue
+            if i.strip().startswith('@'):
+                sets.append(curSet)
+                curSet = Set(i.strip()[1:])
+                continue
+            if i.strip().startswith('$'):
+                
+            line = i.split(';')
+            if len(line)!=2:
+                continue
+
+            w=[]
+            for j in line[0].split(','):
+                w.append(j.strip())
+                        
+        return sets
+
+
+class Set:
+    name=""
+    entries=[]
+
+    def __init__(self, name):
+        self.name = name
+
+    def add(entry):
+        entries.append(entry)
+    
     #Mode: 0 - all, 1 - any, 2 - first; TODO: implement in file
     def train(self, mode = 0, randomly = True, repeat = True):
         count = len(self.words)
@@ -86,5 +114,8 @@ class Set:
 inp=input("File path:\n")
 os.system("cls")
 
-set = Set(inp)
-set.train(mode = 2)
+file = SourceFile(inp)
+sets = file.read()
+
+for i in sets:
+    i.train(mode = 2)

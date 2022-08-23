@@ -1,0 +1,111 @@
+@Basics
+
+$Nouns
+puella, -ae,		{1f};	girl
+puer, -ī,		{2m};	boy
+pater, patris,		{3m};	father
+māter, mātris,		{3f};	mother
+dominus, -ī,		{2m};	master
+lūdus, -ī,		{2m};	school
+oratio, orationis,	{3f};	speech
+uxor, uxoris,		{3f};	wife
+canis, canis,		{3mf};	dog
+proelium, -ī,		{2n};	battle
+oculus, -ī,		{2m};	eye
+amīcus, -ī,		{2m};	friend
+vir, -ī,		{2m};	man
+soror, sororis,		{3f};	sister
+
+$Adjectives
+magnus,	-a, -um,		{1};	large, great
+maior, maioris, maius,		{2};	larger
+maximus, -a, -um,		{1};	largest
+
+parvus, -a, -um,		{1};	small
+minor, minoris, minus,		{2};	smaller
+minimus, -a, -um,		{1};	smallest
+
+bonus, -a, -um,			{1};	good
+melior, melioris, melius;	{2};	better
+optimus, -a, -um;		{1};	best
+
+malus, -a, -um,			{1};	bad
+peior, peioris, peius,		{2};	worse
+pessimus, -a, -um,		{1};	worst
+
+multus, -a, -um,		{1};	many
+plus, pluris,			{2};	more
+plurimus, -a, -um,		{1};	most
+
+pulcher, pulchra, pulchrum,	{1};	pretty
+fortis, fortis, forte,		{2};	strong	
+ferox, ferocis, ferox,		{2};	wild
+longus, -a. -um,		{1};	long
+
+$Pronouns
+ego, mei, mihi, me;	I
+tū, tui, tibi, te;	Thou
+is, eius, ei, eum, eo;	He
+ea, eius, ei, eam, ea;	She
+id, eius, ei, id, eo;	It
+nos, nostri, nobis, nos;We
+vos, vestri, vobis, vos;Ye
+
+
+
+$Verbs
+habeo, habēre, habui, habitum,		{2};	have
+labōro,	labōrāre, laboravi, laboratum,	{1};	work
+amo, amāre, amavi, amatum,		{1};	love
+eo, is, eunt, ire, i[v]i, itum,		{*};	go
+ambulo, ambulare, ambulavi, ambulatum,	{1};	walk
+dīco, dīcere, dixi, dictum,		{3};	say
+caveo, cavere, cavi, cautum,		{2};	beware
+
+$Adverbs
+vix;	hardly, barely
+quam;	than (comparison)
+diu;	long lasting
+saepe;	often
+hodie;	today
+
+$Conjugations
+atque;		and*
+aut;		or
+ergo;		thus
+-que;		-and
+sed;		but
+nec/neque;	nor
+cum;		when
+dum;		while
+nisī;		unless
+quamquam;	however, although, yet
+quod;		because, as far as
+sī;		if
+ubi;		when/where
+ut;		in order to
+
+$Prepositions
+ad, 		+Acc;	to, towards
+ante, 		+Acc;	before
+circum/circa,	+Acc;	around
+contra,		+Acc;	against
+extra,		+Acc;	outside
+in,		+Acc;	into
+inter,		+Acc;	between, among
+per,		+Acc;	through (space), during (time), by means of
+post,		+Acc;	after
+prope,		+Acc;	near
+propter,	+Acc;	because of
+super,		+Acc;	above
+trans,		+Acc;	across
+a[b],		+Abl;	by, from
+cum,		+Abl;	with
+de,		+Abl;	about, down from
+e[x],		+Abl;	out of
+in,		+Abl;	in
+pro,		+Abl;	for, on behalf of
+sine,		+Abl;	without
+sub,		+Abl;	under
+
+@TEST
