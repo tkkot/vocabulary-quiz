@@ -10,6 +10,9 @@ using namespace std;
 
 #ifdef _WIN32
 	#include <windows.h>
+	void init(){
+		system("chcp 65001");
+	}
 	void cls(){ 
 	    COORD tl = {0,0};
 	    CONSOLE_SCREEN_BUFFER_INFO s;
@@ -21,10 +24,24 @@ using namespace std;
 	    SetConsoleCursorPosition(console, tl);
 	}
 #else
+	void init(){
+		
+	}
 	void cls(){
 		cout << "\033[2J\033[1;1H";
 	}
 #endif
+
+map<string, string> longSyl = {{"ā", "a"}, {"ī", "i"}};
+
+template<typename T>
+ostream& operator<<(ostream& stream, const vector<T>& vect){
+	for(const T& i : vect){
+		stream<<i;
+		stream<<", ";
+	}
+	return stream;
+}
 
 void trim(string &s){
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
@@ -60,20 +77,86 @@ struct category{
 	string name;
 };
 
-struct entry{
-	int line;
-	string key;
+struct ansgroup{
+	bool mandatory;
 	vector<string> ans;
-	category cat;
+};
+ostream& operator<<(ostream& stream, const ansgroup& a){
+	if(!a.mandatory)
+		stream<<'*';
+	stream<<a.ans[0]<<", ";
+	for(int i =1; i<a.ans.size(); i++)
+		stream<<'|'<<a.ans[i]<<", ";
+	return stream;
+}
+
+struct entry{
+	char state;
+	int lineNum;
+	string key;
+	vector<ansgroup> ans;
+	const category* cat;
 	
-	entry(int line, string key, vector<string> a, category cat):
-	line(line), key(key), ans(a), cat(cat){
-		for(int i=0; i<ans.size(); i++){
-			trim(ans[i]);
-		}	
+	entry(int lineNum, const string &line, const category* cat, char state = 0):
+		lineNum(lineNum), cat(cat){
+		
+		vector<string> s = split(line, ";");
+		this->key = s[1];
+		trim(this->key);
+		
+		s = split(s[0], ",");
+		for(string& i : s){
+			trim(i);
+			if(startsWith(i, "|"))
+				this->ans.back().ans.pb(i.substr(1));
+			else{
+				this->ans.pb(ansgroup());
+				if(startsWith(i, "*")){
+					this->ans.back().mandatory=0;
+					i=i.substr(1);
+				}
+				else
+					this->ans.back().mandatory=1;
+				this->ans.back().ans.pb(i);
+			}
+		}
 	}
 	
+	bool check(const vector<string>& ans){
+		bool c1 = 0, c2;
+		int c=0;
+		for(ansgroup& i : this->ans){
+			c2=0;
+			for(const string& a : ans){
+//				cout<<a<<" : "<<i.ans<<endl;
+				if(find(i.ans.begin(), i.ans.end(), a) != i.ans.end()){
+					c2=1;
+					c++;
+					break;
+				}
+			}
+			if(c2)
+				c1 = 1;
+			else if(i.mandatory){
+				c1 = 0;
+				break;
+			}
+				
+		}
+		if(c<ans.size())
+			return 0;	
+		
+		return c1;		
+		
+	}
 };
+ostream& operator<<(ostream& stream, const entry& e){
+	stream<<e.lineNum<<' '<<e.cat->name<<": "<<e.key<<"; ";
+	for(ansgroup i : e.ans)
+		stream<<i;
+	return stream;
+}
+
 
 class set{
 public:
@@ -84,6 +167,64 @@ public:
 	set(string name) : name(name) {
 		categories["default"] = {0, "default"};
 	}
+	
+	//settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
+	void train(uint8_t settings = 0b00000000){
+//		for(entry& e : entries){
+//			cout<<e<<endl;
+			
+		if(settings & 0b00000001){
+			random_shuffle(entries.begin(), entries.end());
+			if(settings & 0b00000010){
+				sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
+					return a.cat->num<b.cat->num;
+				});
+			}
+		}
+		else
+			sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
+				return a.lineNum<b.lineNum;
+			});
+			
+//		for(const entry &e : this->entries){
+//			cout<<e<<endl;
+//		}
+			
+			
+		for(entry &e : this->entries){
+			if(e.state == '^')
+				continue;
+			cout<<this->name<<endl;
+			cout<<e.key<<'\n';
+			bool cr = 0;
+			string a;
+			getline(cin, a);
+			
+			vector<string> ans = split(a, ",");
+			for(string& i : ans)
+				trim(i);
+			cr = e.check(ans);
+			if(cr)
+				cout<<"Correct\n";
+			else
+				cout<<"Incorrect\n";
+			cout<<e.ans<<'\n';
+			do{
+				getline(cin, a);
+				trim(a);
+				if(a == "!")
+					cout<<"Correct\n";
+				if(a == "!!"){
+					e.state = '!';
+				}
+				if(a == "^")
+					e.state = '^';
+				
+			}while(a != "");
+			cls();
+		}
+	}
+	
 };
 
 class sourcefile{
@@ -104,9 +245,9 @@ public:
 		is.close();
 	}
 	
-	vector<set> read(){
-		vector<set> sets;
-		sets.pb({"default"});
+	vector<set> *read(){
+		vector<set> *sets = new vector<set>();
+		sets->pb({"default"});
 		string curCat;
 		for(int i=0; i<lines.size(); i++){
 //			clog<<i<<' '<<lines[i]<<'\n';
@@ -115,32 +256,32 @@ public:
 			if(startsWith(lines[i], "#"))
 				continue;
 			if(startsWith(lines[i], "@")){
-				sets.pb({trim_c(lines[i].substr(1))});
+				sets->pb({trim_c(lines[i].substr(1))});
 				continue;
 			}
 			if(startsWith(lines[i], "$")){
 				curCat = trim_c(lines[i].substr(1));
-				sets.back().categories[curCat] = {sets.back().categories.size(), curCat};
+				sets->back().categories[curCat] = {(int)sets->back().categories.size(), curCat};
 				continue;
 			}
-			vector<string> line = split(lines[i], ";");
-//			cout<<'\t';
-//			for(string s : line)
-//				cout<<s<<';';
-//			cout<<"T"<<endl;
-			sets.back().entries.pb( {i, trim_c(line[1]), split(line[0], ","), sets.back().categories[curCat]} );
+			if(startsWith(lines[i], "^")){
+				sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '^' } );
+				continue;
+			}
+			sets->back().entries.pb( {i, lines[i], &(sets->back().categories[curCat]) } );
 		}
 		
 		return sets;
-		
 	}
-	
 };
 
 int32_t main(){
+	init();
+	
 	string path;
-
-	sourcefile sf("Latin words.txt");
+	getline(cin, path);
+	sourcefile sf(path);
+	
 	
 //	cout<<sf.lines.size()<<endl;
 //	for(string line : sf.lines){
@@ -148,17 +289,14 @@ int32_t main(){
 //	}
 //	cout<<"************************************************************************\n";
 	
-	vector<set> sets = sf.read();
+	vector<set> &sets = *sf.read();
 	
-	for(set s : sets){
-		cout<<s.name<<endl;
-		for(entry e : s.entries){
-			cout<<e.line<<' '<<e.cat.name<<'\t'<<e.key<<";\t";
-			for(string ans : e.ans){
-				cout<<ans<<",\t";
-			}
-			cout<<'\n';
-		}
+	for(set& s : sets){
+//		cout<<s.name<<endl;
+//		for(entry& e : s.entries){
+//			cout<<e<<endl;
+//		}
+		s.train(0);
 	}
 
 	return 0;

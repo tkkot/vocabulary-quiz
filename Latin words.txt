@@ -1,19 +1,19 @@
 @Basics
 
 $Nouns
-puella, -ae,		{1f};	girl
-puer, -ī,		{2m};	boy
-pater, patris,		{3m};	father
-māter, mātris,		{3f};	mother
-dominus, -ī,		{2m};	master
-lūdus, -ī,		{2m};	school
-oratio, orationis,	{3f};	speech
+puella, *-ae,	|{1f};	girl
+puer, 	*-ī,	|{2m};	boy
+pater, 	patris,	*{3m};	father
+māter, 	mātris,	*{3f};	mother
+dominus,*-ī,	|{2m};	master
+lūdus,	*-ī,	|{2m};	school
+oratio, orationis, *{3f};	speech
 uxor, uxoris,		{3f};	wife
 canis, canis,		{3mf};	dog
-proelium, -ī,		{2n};	battle
-oculus, -ī,		{2m};	eye
-amīcus, -ī,		{2m};	friend
-vir, -ī,		{2m};	man
+proelium,*-ī,		{2n};	battle
+oculus, *-ī,		{2m};	eye
+amīcus, *-ī,		{2m};	friend
+vir, *-ī,		{2m};	man
 soror, sororis,		{3f};	sister
 
 $Adjectives
