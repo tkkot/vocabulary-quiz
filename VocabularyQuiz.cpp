@@ -6,12 +6,11 @@
 #include <cctype>
 #include <map>
 
-using namespace std;
-
-#ifdef _WIN32
+#ifdef WIN32
 	#include <windows.h>
+	
 	void init(){
-		system("chcp 65001");
+//		system("chcp 65001");
 	}
 	void cls(){ 
 	    COORD tl = {0,0};
@@ -32,7 +31,9 @@ using namespace std;
 	}
 #endif
 
-map<string, string> longSyl = {{"훮", "a"}, {"카", "i"}};
+using namespace std;
+
+//map<string, string> longSyl = {{"훮", "a"}, {"카", "i"}};
 
 template<typename T>
 ostream& operator<<(ostream& stream, const vector<T>& vect){
@@ -78,12 +79,14 @@ struct category{
 };
 
 struct ansgroup{
-	bool mandatory;
-	vector<string> ans;
+	uint8_t type;	// 0 - mandatory, '*' - not-mandatory, '-' - ending
+	vector<string> ans;	 
 };
 ostream& operator<<(ostream& stream, const ansgroup& a){
-	if(!a.mandatory)
+	if(a.type == '*')
 		stream<<'*';
+	else if(a.type == '-')
+		stream<<'-';
 	stream<<a.ans[0]<<", ";
 	for(int i =1; i<a.ans.size(); i++)
 		stream<<'|'<<a.ans[i]<<", ";
@@ -98,9 +101,13 @@ struct entry{
 	const category* cat;
 	
 	entry(int lineNum, const string &line, const category* cat, char state = 0):
-		lineNum(lineNum), cat(cat){
+		lineNum(lineNum), cat(cat), state(state){
 		
 		vector<string> s = split(line, ";");
+		if(s.size() != 2) {
+			cerr<<"Line "<<lineNum<<" is not formatted correctly:\n"<<line<<'\n';
+			return;
+		}
 		this->key = s[1];
 		trim(this->key);
 		
@@ -112,11 +119,15 @@ struct entry{
 			else{
 				this->ans.pb(ansgroup());
 				if(startsWith(i, "*")){
-					this->ans.back().mandatory=0;
+					this->ans.back().type='*';
+					i=i.substr(1);
+				}
+				else if(startsWith(i, "-")){
+					this->ans.back().type='-';
 					i=i.substr(1);
 				}
 				else
-					this->ans.back().mandatory=1;
+					this->ans.back().type=0;
 				this->ans.back().ans.pb(i);
 			}
 		}
@@ -137,7 +148,7 @@ struct entry{
 			}
 			if(c2)
 				c1 = 1;
-			else if(i.mandatory){
+			else if(i.type == 0){
 				c1 = 0;
 				break;
 			}
@@ -170,9 +181,22 @@ public:
 	
 	//settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
 	void train(uint8_t settings = 0b00000000){
+		int correct = 0;
 //		for(entry& e : entries){
 //			cout<<e<<endl;
+
+		if(entries.empty())
+			return;	
 			
+		cout<<"Train set "<<name<<"? y/n\n";
+		string a;
+		getline(cin, a);
+		trim(a);
+		
+		if(a == "y" || a=="Y")
+			goto __START_TRAINING__;
+		return;
+	__START_TRAINING__:
 		if(settings & 0b00000001){
 			random_shuffle(entries.begin(), entries.end());
 			if(settings & 0b00000010){
@@ -189,31 +213,29 @@ public:
 //		for(const entry &e : this->entries){
 //			cout<<e<<endl;
 //		}
-			
-			
+
 		for(entry &e : this->entries){
 			if(e.state == '^')
 				continue;
 			cout<<this->name<<endl;
+			cout<<e.cat->name<<endl;
 			cout<<e.key<<'\n';
 			bool cr = 0;
-			string a;
 			getline(cin, a);
 			
 			vector<string> ans = split(a, ",");
 			for(string& i : ans)
 				trim(i);
 			cr = e.check(ans);
-			if(cr)
-				cout<<"Correct\n";
-			else
-				cout<<"Incorrect\n";
+			cout<<(cr ? "Correct\n" : "Incorrect\n");
 			cout<<e.ans<<'\n';
 			do{
 				getline(cin, a);
 				trim(a);
-				if(a == "!")
-					cout<<"Correct\n";
+				if(a == "!"){
+					cr = !cr;
+					cout<<(cr ? "Correct\n" : "Incorrect\n");
+				}
 				if(a == "!!"){
 					e.state = '!';
 				}
@@ -221,8 +243,10 @@ public:
 					e.state = '^';
 				
 			}while(a != "");
+			correct += cr;
 			cls();
 		}
+		cout<<correct<<" / "<<entries.size()<<" : "<<(entries.size() ? to_string(100 * correct / entries.size()) : "~")<<"%\n";
 	}
 	
 };
@@ -230,22 +254,21 @@ public:
 class sourcefile{
 public:
 	vector<string> lines;
+	string path;
 
-	sourcefile(string path){
+	sourcefile(string path) : path(path) {}
+	
+	vector<set> *read(){
 		string s;
 		ifstream is(path);
-		if(!is){
-			cerr<<"File not found\n";
-			return;
-		}
+		if(!is)
+			return nullptr;
 		while(getline(is, s)){
 			trim(s);
 			lines.pb(s);
 		}
 		is.close();
-	}
 	
-	vector<set> *read(){
 		vector<set> *sets = new vector<set>();
 		sets->pb({"default"});
 		string curCat;
@@ -268,10 +291,39 @@ public:
 				sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '^' } );
 				continue;
 			}
+			if(startsWith(lines[i], "!")){
+				sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '!'} );
+				continue;
+			}
 			sets->back().entries.pb( {i, lines[i], &(sets->back().categories[curCat]) } );
 		}
+		cout<<"File read successfully\nPress ENTER to continue\n";
+		getline(cin, curCat);
+		cls();
 		
 		return sets;
+	}
+	
+	void update(const vector<set>& sets){
+		for(const set& set : sets){
+			for(const entry& e : set.entries){
+				if(lines[e.lineNum][0] != e.state && e.state>0)
+					lines[e.lineNum] = e.state + lines[e.lineNum];
+			}
+		}
+	}
+	
+	void write(){
+		ofstream os(path);
+		if(!os){
+			cerr<<"File not found\n"<<path;
+			return;
+		}
+		for(const string& line : lines){
+			os<<line<<'\n';
+			cout<<line<<'\n';
+		}
+		os.close();
 	}
 };
 
@@ -280,8 +332,8 @@ int32_t main(){
 	
 	string path;
 	getline(cin, path);
+//	sourcefile sf("C:\\Users\\Tobiasz\\OneDrive\\Szko쿪\\test.txt");
 	sourcefile sf(path);
-	
 	
 //	cout<<sf.lines.size()<<endl;
 //	for(string line : sf.lines){
@@ -291,6 +343,18 @@ int32_t main(){
 	
 	vector<set> &sets = *sf.read();
 	
+	if(!&sets){
+		cerr<<"File not found\n"<<path;
+		getline(cin, path);
+		return 2;
+	}
+	
+	cout<<"List of training sets if sourcefile:\n";
+	
+	for(int i = 0; i<sets.size(); i++){
+		cout<<i+1<<". "<<sets[i].name<<endl;
+	}
+	
 	for(set& s : sets){
 //		cout<<s.name<<endl;
 //		for(entry& e : s.entries){
@@ -298,6 +362,11 @@ int32_t main(){
 //		}
 		s.train(0);
 	}
+	
+	sf.update(sets);
+//	sf.write();
+	
+	delete &sets;
 
 	return 0;
 }

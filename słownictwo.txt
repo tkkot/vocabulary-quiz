@@ -1,0 +1,128 @@
+@ko'rperteile 14.09.22
+r Ko'rper; cieło
+r Teil, -e; część
+
+$Teile
+s Auge, -n; oko
+r Kopf, -:e; głowa
+s Bei, -e; noga
+r Zahne, -:e; ząb
+r Ohr, -en; ucho
+s Gesicht; twarz
+e Nase; nos
+r Mund; usta
+r Hals; szyja/gardło
+e Brust; pierś
+r Arm, -e; ramię
+e Hand, -:en; dłoń
+r Finger; palec
+r Bauch; brzuch
+r Ru'cken; plecy
+s Bein; noga
+s Knie; kolano
+r Fus', -:e; stopa
+s Finger; palec (ręka)
+e Zehe, -n; palec (stopa)
+
+$Verbe
+strecken;	rozciągać
+drehen;		kręcić
+schlies'en, schloss, geschlossen;	zamykać
+beugen; zginać
+
+nach hinten; w górę
+nach vorne;
+nach oben;
+nach unten;
+auf die Seiten; na strony
+
+$Redenwundungen
+Redenwendung -en; przysłowie
+vier Augen sehen mehr als zwei; ~co dwie głowy to nie jedna
+[fu'r jdn/etw] den Kopf hinhalten; Nadstawiać [za kogoś] karku
+Lo'gen haben kurtze Beine; kłamstwo ma krótkie nogi
+Auge um Auge, Zahn um Zahn; oko za oko, żab za ząb
+die Wa'nde haben Ohren; ściany mają uszy
+
+
+@Die Unfa'lle 28.09
+der Unfall, -:e; wypadek
+die Verletzung;	kontuzja
+die Wunde;	rana
+der Sturz. -:e;	upadek
+
+d'unn;	szczupły, chudy
+erschrocken;	przestraszony
+verantwortlich;	odpowiedzialny
+
+trotzdem, +przest.;	pomimo tego
+obwohl, +pob.;	chociaż
+
+bereits; już
+
+verletzen, jdn an + dat.;	ulec kontuzji / skaleczyć się
+tragen, trug, getragen;		nosić
+brechen, brach, gebrochen;	łamać
+verstauchen, jdm etw, |sich etw;	skręcić sobie coś
+stu'rzen, stu'rzte, s gestu'rzt;	upsaść
+bewegen, bewog, bewogen;	ruszać
+sich unterhalten, unterhielt, unterhalten; prowadzić rozmowę
+legen, legte, gelegt;	kłaść
+liegen, lag, gelegen;	leżeć
+kriechen, kroch, s gekrochen;	pełzać, czołgać się
+vertreten, vertrat, vertreten;	zastępować
+jdm etw vertreten;	zwichnąć
+die Beine/Fu's'e vertreten;	rozprostować kości
+an|wenden, wandte  an, angewandt; stosować
+
+
+@Beim Arzt 05.10
+
+#beim = bei + dem
+behandeln
+
+r HNOArzt, Hals Nase Ohr;	laryngolog
+
+erka'ltet;	przeziębiony
+e Erka'ltung;	przeziębienie
+
+e Krankheit;	choroba
+ Symptom;	objaw
+
+Grippe
+Alergie
+Angina
+Schnupfen; Katar
+Krebst;	Rak
+e Naubildung;	nowotwór
+bilden;	tworzyć
+
+Husten; kaszel
+Schmerzen;	bóle
+Fieber;	gorączka
+Ausschlag;	wysypka
+weh|tun;	boleć
+tun, tat, getan;	czynić
+Weh;	ból
+niesen;	kichać
+
+Tropfen;	krople
+Salba;	maść
+einnehmen
+messen
+
+wachsen;	rosnąć
+sparen;	oszczędzać
+beleuchten;	oświetlać
+R Denkmal;	pomnik
+e Regierung; rzad
+ein|schalten;	włączać
+aus|schalten;	wyłączać
+e Werbung;	reklama
+ab;	od (przyszłość)
+seit;	od (przeszłość)
+Trockner;	suszarka(do ubrań)
+trocken;	suchy
+empfehlen;	polecać
+nutzen;	używać
+Angst;	strach
