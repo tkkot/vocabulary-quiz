@@ -196,7 +196,9 @@ public:
 		if(a == "y" || a=="Y")
 			goto __START_TRAINING__;
 		return;
+	
 	__START_TRAINING__:
+		cls();
 		if(settings & 0b00000001){
 			random_shuffle(entries.begin(), entries.end());
 			if(settings & 0b00000010){
@@ -228,7 +230,10 @@ public:
 				trim(i);
 			cr = e.check(ans);
 			cout<<(cr ? "Correct\n" : "Incorrect\n");
-			cout<<e.ans<<'\n';
+			for(ansgroup i : e.ans){
+				cout<<i;
+			}
+			cout<<'\n';
 			do{
 				getline(cin, a);
 				trim(a);
@@ -331,6 +336,7 @@ int32_t main(){
 	init();
 	
 	string path;
+	cout<<"Enter file path:\n";
 	getline(cin, path);
 //	sourcefile sf("C:\\Users\\Tobiasz\\OneDrive\\Szko³a\\test.txt");
 	sourcefile sf(path);
