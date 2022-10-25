@@ -1,12 +1,12 @@
 @ko'rperteile 14.09.22
-r Ko'rper; cieło
+r Ko'rper; ciało
 r Teil, -e; część
 
 $Teile
 s Auge, -n; oko
 r Kopf, -:e; głowa
 s Bei, -e; noga
-r Zahne, -:e; ząb
+r Zahn, -:e; ząb
 r Ohr, -en; ucho
 s Gesicht; twarz
 e Nase; nos
@@ -79,43 +79,78 @@ an|wenden, wandte  an, angewandt; stosować
 @Beim Arzt 05.10
 
 #beim = bei + dem
-behandeln
+$Symptome
+
+^s Symptom, -e;	objaw
+^r Schnupfen; Katar
+^r Husten; kaszel
+r Schmerz, -en;	ból
+^s Fieber;	gorączka
+r Ausschlag;	wysypka
+^e Temperatur;	temperatura
+niesen;	kichać
+
+^weh|tun;	boleć
+^tun, tat, getan;	czynić
+^s Weh;	ból
+
+^sich fu'hlen;	czuć się
+^la'uft jdm die Nase;	lecieć z nosa
+^messen, misst, mas', gemessen;	mierzyć
+
+$Krankheiten
+
+^e Krankheit;	choroba
+
+^e Grippe;	grypa
+^e Alergie;	alergia
+^e Angina;	angina
+^r Krebs;	Rak
+^e Neubildung;	nowotwór
+^bilden;	tworzyć
+
+^erka'ltet;	przeziębiony
+^e Erka'ltung;	przeziębienie
+
+$Medikamente
+
+^Tropfen;	krople
+^e Salbe;	maść
+
+^ein|nehmen;	zażywać
+^dosieren;	dozować
+aus|stellen;	wystawić, sporządzić (np receptę)
+
+$Beim Arzt
+^e Bettruhe;	leżenie w łóżku
+verordnen;	zalecać
+^r Blutdruck;	ciśnienie krwi
+^untersuchen;	badać
+^krank|schreiben; wystawiać zwolnienie lekarskie
+^messen;		mierzyć
+^verschreiben;	przepisywać (lekarstwa)
+an|schauen;	oglądać
+ab|horchen;	osłuchać
+fehlen;		brakować (dolegać)
+^wirken;	działać
+atmen;		oddychać
+^schaffen;	podołać
+
+
+@Nie na kartkówkę
+behandeln;	traktować
 
 r HNOArzt, Hals Nase Ohr;	laryngolog
 
-erka'ltet;	przeziębiony
-e Erka'ltung;	przeziębienie
-
-e Krankheit;	choroba
- Symptom;	objaw
-
-Grippe
-Alergie
-Angina
-Schnupfen; Katar
-Krebst;	Rak
-e Naubildung;	nowotwór
-bilden;	tworzyć
-
-Husten; kaszel
-Schmerzen;	bóle
-Fieber;	gorączka
-Ausschlag;	wysypka
-weh|tun;	boleć
-tun, tat, getan;	czynić
-Weh;	ból
-niesen;	kichać
-
-Tropfen;	krople
-Salba;	maść
-einnehmen
-messen
 
 wachsen;	rosnąć
-sparen;	oszczędzać
+sparen;		oszczędzać
 beleuchten;	oświetlać
-R Denkmal;	pomnik
+e Beleuchtung;	oświetlenie
+r Denkmal;	pomnik
+beheizen;	ogrzewać
 e Regierung; rzad
+e Heizung;	ogrzewanie
 ein|schalten;	włączać
 aus|schalten;	wyłączać
 e Werbung;	reklama
@@ -126,3 +161,12 @@ trocken;	suchy
 empfehlen;	polecać
 nutzen;	używać
 Angst;	strach
+
+
+
+der Einfluss, +von;	wpływ
+mindestens;	conajmniej
+Herzinfarkt;	zawał serca
+
+$Spójniki
+sonst, sz. prz., |szyk przestawny;	w przeciwnym razie

@@ -173,6 +173,7 @@ class set{
 public:
 	string name;
 	vector<entry> entries;
+	int activeEntries;
 	map<string, category> categories;
 	
 	set(string name) : name(name) {
@@ -182,12 +183,15 @@ public:
 	//settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
 	void train(uint8_t settings = 0b00000000){
 		int correct = 0;
-//		for(entry& e : entries){
-//			cout<<e<<endl;
+		activeEntries = 0;
+		for(entry& e : entries){
+			if(e.state != '^')
+				activeEntries++;
+		}
 
-		if(entries.empty())
+		if(activeEntries == 0)
 			return;	
-			
+
 		cout<<"Train set "<<name<<"? y/n\n";
 		string a;
 		getline(cin, a);
@@ -251,7 +255,7 @@ public:
 			correct += cr;
 			cls();
 		}
-		cout<<correct<<" / "<<entries.size()<<" : "<<(entries.size() ? to_string(100 * correct / entries.size()) : "~")<<"%\n";
+		cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";
 	}
 	
 };
@@ -370,7 +374,7 @@ int32_t main(){
 	}
 	
 	sf.update(sets);
-//	sf.write();
+	sf.write();
 	
 	delete &sets;
 
