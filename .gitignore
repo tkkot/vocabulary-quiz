@@ -1,3 +1,13 @@
 
 testEncoding.exe
 testEncoding.cpp
+UTF-8.win
+UTF-8.nix
+UTF-16.LE.win
+UTF-16.LE.nix
+UTF-16.BE.win
+UTF-16.BE.nix
+ANSI
+write.UTF-8
+słownictwo.txt
+Latin words.txt

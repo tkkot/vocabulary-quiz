@@ -5,11 +5,13 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <ctime>
 
 #ifdef WIN32
 	#include <windows.h>
 	
 	void init(){
+		srand(time(0));
 //		system("chcp 65001");
 	}
 	void cls(){ 
@@ -24,7 +26,7 @@
 	}
 #else
 	void init(){
-		
+		srand(time(0));
 	}
 	void cls(){
 		std::cout << "\033[2J\033[1;1H";
