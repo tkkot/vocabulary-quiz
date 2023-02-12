@@ -1,8 +1,7 @@
-#include "util.h"
+#include "functions.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
 using namespace std;
 
 #ifdef WIN32
@@ -59,4 +58,21 @@ vector<string> split(string s, const string& c){
 	}
 	v.push_back(s);
 	return v;
+}
+
+ostream& operator<<(ostream& stream, const ansgroup& a){
+	if(a.type == '*')
+		stream<<'*';
+	else if(a.type == '-')
+		stream<<'-';
+	stream<<a.ans[0]<<", ";
+	for(int i =1; i<a.ans.size(); i++)
+		stream<<'|'<<a.ans[i]<<", ";
+	return stream;
+}
+ostream& operator<<(ostream& stream, const entry& e){
+	stream<<e.lineNum<<' '<<e.cat->name<<": "<<e.key<<"; ";
+	for(ansgroup i : e.ans)
+		stream<<i;
+	return stream;
 }

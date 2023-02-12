@@ -1,13 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#define pb push_back
-#include <algorithm>
 #include <cctype>
-#include <map>
 #include <ctime>
 
-#include "util.h"
+#include "functions.h"
+#define pb push_back
 
 #ifdef WIN32
 	#include <windows.h>
@@ -27,309 +24,56 @@ using namespace std;
 
 //map<string, string> longSyl = {{"ā", "a"}, {"ī", "i"}};
 
-struct category{
-	int num;
-	string name;
-};
+string filepath;
 
-struct ansgroup{
-	uint8_t type;	// 0 - mandatory, '*' - not-mandatory, '-' - ending
-	vector<string> ans;	 
-};
-ostream& operator<<(ostream& stream, const ansgroup& a){
-	if(a.type == '*')
-		stream<<'*';
-	else if(a.type == '-')
-		stream<<'-';
-	stream<<a.ans[0]<<", ";
-	for(int i =1; i<a.ans.size(); i++)
-		stream<<'|'<<a.ans[i]<<", ";
-	return stream;
-}
-
-struct entry{
-	char state;
-	int lineNum;
-	string key;
-	vector<ansgroup> ans;
-	const category* cat;
-	
-	entry(int lineNum, const string &line, const category* cat, char state = 0):
-		lineNum(lineNum), cat(cat), state(state){
-		
-		vector<string> s = split(line, ";");
-		if(s.size() != 2) {
-			cerr<<"Line "<<lineNum<<" is not formatted correctly:\n"<<line<<'\n';
-			return;
-		}
-		this->key = s[1];
-		trim(this->key);
-		
-		s = split(s[0], ",");
-		for(string& i : s){
-			trim(i);
-			if(startsWith(i, "|"))
-				this->ans.back().ans.pb(i.substr(1));
-			else{
-				this->ans.pb(ansgroup());
-				if(startsWith(i, "*")){
-					this->ans.back().type='*';
-					i=i.substr(1);
-				}
-				else if(startsWith(i, "-")){
-					this->ans.back().type='-';
-					i=i.substr(1);
-				}
-				else
-					this->ans.back().type=0;
-				this->ans.back().ans.pb(i);
-			}
-		}
-	}
-	
-	bool check(const vector<string>& ans){
-		bool c1 = 0, c2;
-		int c=0;
-		for(ansgroup& i : this->ans){
-			c2=0;
-			for(const string& a : ans){
-//				cout<<a<<" : "<<i.ans<<endl;
-				if(find(i.ans.begin(), i.ans.end(), a) != i.ans.end()){
-					c2=1;
-					c++;
-					break;
-				}
-			}
-			if(c2)
-				c1 = 1;
-			else if(i.type == 0){
-				c1 = 0;
-				break;
-			}
-				
-		}
-		if(c<ans.size())
-			return 0;	
-		
-		return c1;		
-		
-	}
-};
-ostream& operator<<(ostream& stream, const entry& e){
-	stream<<e.lineNum<<' '<<e.cat->name<<": "<<e.key<<"; ";
-	for(ansgroup i : e.ans)
-		stream<<i;
-	return stream;
-}
-
-
-class set{
-public:
-	string name;
-	vector<entry> entries;
-	int activeEntries;
-	map<string, category> categories;
-	
-	set(string name) : name(name) {
-		categories["default"] = {0, "default"};
-	}
-	
-	//settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
-	void train(uint8_t settings = 0b00000000){
-		int correct = 0;
-		activeEntries = 0;
-		for(entry& e : entries){
-			if(e.state != '^')
-				activeEntries++;
-		}
-
-		if(activeEntries == 0)
-			return;	
-
-		cout<<"Train set "<<name<<"? y/N\n";
-		string a;
-		getline(cin, a);
-		trim(a);
-		
-		if(a == "y" || a=="Y")
-			goto __START_TRAINING__;
-		return;
-	
-	__START_TRAINING__:
-		cls();
-		if(settings & 0b00000001){
-			random_shuffle(entries.begin(), entries.end());
-			if(settings & 0b00000010){
-				sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
-					return a.cat->num<b.cat->num;
-				});
-			}
-		}
-		else
-			sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
-				return a.lineNum<b.lineNum;
-			});
-			
-//		for(const entry &e : this->entries){
-//			cout<<e<<endl;
-//		}
-
-		for(entry &e : this->entries){
-			if(e.state == '^')
-				continue;
-			cout<<this->name<<endl;
-			cout<<e.cat->name<<endl;
-			cout<<e.key<<'\n';
-			bool cr = 0;
-			getline(cin, a);
-			
-			vector<string> ans = split(a, ",");
-			for(string& i : ans)
-				trim(i);
-			cr = e.check(ans);
-			cout<<(cr ? "Correct\n" : "Incorrect\n");
-			for(ansgroup i : e.ans){
-				cout<<i;
-			}
-			cout<<'\n';
-			do{
-				getline(cin, a);
-				trim(a);
-				if(a == "!"){
-					cr = !cr;
-					cout<<(cr ? "Correct\n" : "Incorrect\n");
-				}
-				if(a == "!!"){
-					e.state = '!';
-				}
-				if(a == "^")
-					e.state = '^';
-				
-			}while(a != "");
-			correct += cr;
-			cls();
-		}
-		cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";
-	}
-	
-};
-
-class sourcefile{
-public:
-	vector<string> lines;
-	string path;
-
-	sourcefile(string path) : path(path) {}
-	
-	vector<set> *read(){
-		string s;
-		ifstream is(path);
-		if(!is)
-			return nullptr;
-		while(getline(is, s)){
-			trim(s);
-			lines.pb(s);
-		}
-		is.close();
-	
-		vector<set> *sets = new vector<set>();
-		sets->pb({"default"});
-		string curCat;
-		for(int i=0; i<lines.size(); i++){
-//			clog<<i<<' '<<lines[i]<<'\n';
-			if(lines[i].empty())
-				continue;
-			if(startsWith(lines[i], "#"))
-				continue;
-			if(startsWith(lines[i], "@")){
-				sets->pb({trim_c(lines[i].substr(1))});
-				continue;
-			}
-			if(startsWith(lines[i], "$")){
-				curCat = trim_c(lines[i].substr(1));
-				sets->back().categories[curCat] = {(int)sets->back().categories.size(), curCat};
-				continue;
-			}
-			if(startsWith(lines[i], "^")){
-				sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '^' } );
-				continue;
-			}
-			if(startsWith(lines[i], "!")){
-				sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '!'} );
-				continue;
-			}
-			sets->back().entries.pb( {i, lines[i], &(sets->back().categories[curCat]) } );
-		}
-		cout<<"File read successfully\nPress ENTER to continue\n";
-		getline(cin, curCat);
-		cls();
-		
-		return sets;
-	}
-	
-	void update(const vector<set>& sets){
-		for(const set& set : sets){
-			for(const entry& e : set.entries){
-				if(lines[e.lineNum][0] != e.state && e.state>0)
-					lines[e.lineNum] = e.state + lines[e.lineNum];
-			}
-		}
-	}
-	
-	void write(){
-		ofstream os(path);
-		if(!os){
-			cerr<<"File not found\n"<<path;
-			return;
-		}
-		for(const string& line : lines){
-			os<<line<<'\n';
-			cout<<line<<'\n';
-		}
-		os.close();
-	}
-};
-
-int32_t main(){
+int32_t main(int argc, char *argv[]){
 	init();
-	
-	string path;
-	cout<<"Enter file path:\n";
-	getline(cin, path);
-//	sourcefile sf("C:\\Users\\Tobiasz\\OneDrive\\Szko�a\\test.txt");
-	sourcefile sf(path);
-	
-//	cout<<sf.lines.size()<<endl;
-//	for(string line : sf.lines){
-//		cout<<line<<'\n';
-//	}
-//	cout<<"************************************************************************\n";
-	
-	vector<set> &sets = *sf.read();
-	
+
+	//TEMP
+	for(int i=0; i<argc; i++)
+		clog<<argv[i]<<", ";
+	clog<<endl;
+
+	//Parse parameters
+	//Default: start UI loop
+	//train [path] - start training sets from path
+
+
+	//TODO - proper argument parsing
+	if (argc>1){
+		if(argv[1]=="train"){
+			if (argc>2)
+				filepath=argv[2];
+			else
+				filepath=askPath();
+
+		}
+	}
+
+	UIstart();
+
+	sourcefile sf(filepath);	//And this as function
+	vector<set> &sets = *sf.read();		//store sets in THIS file
 	if(!&sets){
-		cerr<<"File not found\n"<<path;
-		getline(cin, path);
+		cerr<<"File not found\n"<<filepath;
+		getline(cin, filepath);
 		return 2;
 	}
-	
-	cout<<"List of training sets if sourcefile:\n";
-	
+
+	//All to UI
+	cout<<"List of training sets in sourcefile:\n";
 	for(int i = 0; i<sets.size(); i++){
 		cout<<i+1<<". "<<sets[i].name<<endl;
 	}
-	
+
+	//training activated by UI or argument
 	for(set& s : sets){
-//		cout<<s.name<<endl;
-//		for(entry& e : s.entries){
-//			cout<<e<<endl;
-//		}
 		s.train(3);
 	}
-	
-	sf.update(sets);
+
+	sf.update(sets);	//dynamic updating of data?
 	sf.write();
-	
+
 	delete &sets;
 
 	return 0;

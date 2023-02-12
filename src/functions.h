@@ -1,11 +1,16 @@
 #pragma once
-#ifndef vector
-	#include <vector>
-#endif
-#ifndef string
-	#include <string>
-#endif
 
+#include "types.h"
+
+//Output
+std::ostream& operator<<(std::ostream& stream, const ansgroup& a);
+std::ostream& operator<<(std::ostream& stream, const entry& e);
+
+//UI
+void UIstart();
+std::string askPath();
+
+//util
 void cls();
 
 template<typename T>
@@ -17,3 +22,4 @@ std::string trim_c(std::string s);
 bool startsWith(const std::string& s, const std::string& prefix);
 
 std::vector<std::string> split(std::string s, const std::string& c);
+
