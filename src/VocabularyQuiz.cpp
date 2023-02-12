@@ -7,73 +7,25 @@
 #include <map>
 #include <ctime>
 
+#include "util.h"
+
 #ifdef WIN32
 	#include <windows.h>
-	
+
 	void init(){
 		srand(time(0));
 //		system("chcp 65001");
 	}
-	void cls(){ 
-	    COORD tl = {0,0};
-	    CONSOLE_SCREEN_BUFFER_INFO s;
-	    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);   
-	    GetConsoleScreenBufferInfo(console, &s);
-	    DWORD written, cells = s.dwSize.X * s.dwSize.Y;
-	    FillConsoleOutputCharacter(console, ' ', cells, tl, &written);
-	    FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
-	    SetConsoleCursorPosition(console, tl);
-	}
+
 #else
 	void init(){
 		srand(time(0));
-	}
-	void cls(){
-		std::cout << "\033[2J\033[1;1H";
 	}
 #endif
 
 using namespace std;
 
 //map<string, string> longSyl = {{"ā", "a"}, {"ī", "i"}};
-
-template<typename T>
-ostream& operator<<(ostream& stream, const vector<T>& vect){
-	for(const T& i : vect){
-		stream<<i;
-		stream<<", ";
-	}
-	return stream;
-}
-
-void trim(string &s){
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }));
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
-}
-string trim_c(string s){
-	trim(s);
-	return s;
-}
-
-bool startsWith(const string& s, const string& prefix){
-	return prefix == s.substr(0, prefix.size());
-}
-
-vector<string> split(string s, const string& c){
-	int i=0;
-	vector<string> v;
-	while( (i = s.find(c)) != string::npos){
-		v.pb(s.substr(0, i));
-		s.erase(0, i + c.size());
-	}
-	v.pb(s);
-	return v;
-}
-
 
 struct category{
 	int num;
@@ -194,7 +146,7 @@ public:
 		if(activeEntries == 0)
 			return;	
 
-		cout<<"Train set "<<name<<"? y/n\n";
+		cout<<"Train set "<<name<<"? y/N\n";
 		string a;
 		getline(cin, a);
 		trim(a);
@@ -372,7 +324,7 @@ int32_t main(){
 //		for(entry& e : s.entries){
 //			cout<<e<<endl;
 //		}
-		s.train(0);
+		s.train(3);
 	}
 	
 	sf.update(sets);
