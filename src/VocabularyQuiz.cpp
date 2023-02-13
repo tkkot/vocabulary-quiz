@@ -23,16 +23,13 @@
 using namespace std;
 
 //map<string, string> longSyl = {{"ā", "a"}, {"ī", "i"}};
-
-string filepath;
+vector<set> *sets;
 
 int32_t main(int argc, char *argv[]){
-	init();
 
-	//TEMP
-	for(int i=0; i<argc; i++)
-		clog<<argv[i]<<", ";
-	clog<<endl;
+	string filepath;
+
+	init();
 
 	//Parse parameters
 	//Default: start UI loop
@@ -41,17 +38,18 @@ int32_t main(int argc, char *argv[]){
 
 	//TODO - proper argument parsing
 	if (argc>1){
-		if(argv[1]=="train"){
+		if(! strcmp(argv[1], "train")){
+			//Call functions in UI outside loop
 			if (argc>2)
 				filepath=argv[2];
 			else
 				filepath=askPath();
-
+			trainFile(filepath);
 		}
 	}
-
 	UIstart();
 
+/*
 	sourcefile sf(filepath);	//And this as function
 	vector<set> &sets = *sf.read();		//store sets in THIS file
 	if(!&sets){
@@ -75,7 +73,12 @@ int32_t main(int argc, char *argv[]){
 	sf.write();
 
 	delete &sets;
-
+*/
+	if (sets){
+//		cout<<"Deleting\n";
+		delete sets;
+	}
+//	clog<<"END\n";
 	return 0;
 }
 

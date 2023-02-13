@@ -12,6 +12,7 @@ using namespace std;
 typedef void (*cmd_t)(const vector<string>&);
 
 uint8_t flags;
+string p_line;
 
 /// Program util functions
 void f_help(const vector<string>& args){
@@ -56,7 +57,7 @@ string askPath(){
 
 ///Start UI loop
 void UIstart(){
-
+	cls();
 	cout<<mes::welcome;
 
 	flags |= 1;

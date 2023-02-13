@@ -1,4 +1,3 @@
-#include "types.h"
 #include "functions.h"
 #include <iostream>
 #include <algorithm>
@@ -147,6 +146,7 @@ __START_TRAINING__:
 		cls();
 	}
 	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";
+	getline(cin, p_line);
 }
 
 
@@ -191,6 +191,7 @@ vector<set>* sourcefile::read(){
 		}
 		sets->back().entries.pb( {i, lines[i], &(sets->back().categories[curCat]) } );
 	}
+
 	cout<<"File read successfully\nPress ENTER to continue\n";
 	getline(cin, curCat);
 	cls();
@@ -218,4 +219,23 @@ void sourcefile::write(){
 		cout<<line<<'\n';
 	}
 	os.close();
+	return;
+}
+
+void trainFile(string filepath){
+	sourcefile sf(filepath);
+	sets=sf.read();
+	if(!sets){
+		cerr<<"File not found\n"<<filepath;
+		cls();
+		return;
+	}
+	//sets=readSetsFromFile(filepath);
+	//train sets
+	for(set &s : *sets)
+		s.train(3);
+	//getline(cin, p_line);
+	sf.update(*sets);	//dynamic updating of data?
+	sf.write();
+	return;
 }
