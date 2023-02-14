@@ -4,7 +4,7 @@
 #include <algorithm>
 using namespace std;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 	#include <windows.h>
 
 	void cls(){
@@ -16,6 +16,7 @@ using namespace std;
 	    FillConsoleOutputCharacter(console, ' ', cells, tl, &written);
 	    FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
 	    SetConsoleCursorPosition(console, tl);
+		cout << "=============================" << "\n\n";
 	}
 #else
 	void cls(){
