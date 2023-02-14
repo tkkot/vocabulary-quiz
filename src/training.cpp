@@ -13,7 +13,7 @@ entry::entry(int lineNum, const string &line, const category* cat, char state):
 
 	vector<string> s = split(line, ";");
 	if(s.size() != 2) {
-		cerr<<"Line "<<lineNum<<" is not formatted correctly:\n"<<line<<'\n';	//TODO move handling to UI
+		cout<<"Line "<<lineNum<<" is not formatted correctly:\n"<<line<<'\n';	//TODO move handling to UI
 		return;
 	}
 	this->key = s[1];
@@ -145,26 +145,24 @@ __START_TRAINING__:
 		correct += cr;
 		cls();
 	}
-	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";
-	getline(cin, p_line);
+	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n"; getline(cin, a);
 }
 
 
 sourcefile::sourcefile(string path) : path(path) {}
 
-vector<set>* sourcefile::read(){
+bool sourcefile::read(){
 	string s;
 	ifstream is(this->path);
 	if(!is)
-		return nullptr;
+		return false;
 	while(getline(is, s)){
 		trim(s);
 		lines.pb(s);
 	}
 	is.close();
 
-	vector<set> *sets = new vector<set>();
-	sets->pb({"default"});
+	this->sets.pb({"default"});
 	string curCat;
 	for(int i=0; i<lines.size(); i++){
 //			clog<<i<<' '<<lines[i]<<'\n';
@@ -173,34 +171,33 @@ vector<set>* sourcefile::read(){
 		if(startsWith(lines[i], "#"))
 			continue;
 		if(startsWith(lines[i], "@")){
-			sets->pb({trim_c(lines[i].substr(1))});
+			this->sets.pb({trim_c(lines[i].substr(1))});
 			continue;
 		}
 		if(startsWith(lines[i], "$")){
 			curCat = trim_c(lines[i].substr(1));
-			sets->back().categories[curCat] = {(int)sets->back().categories.size(), curCat};
+			this->sets.back().categories[curCat] = {(int)this->sets.back().categories.size(), curCat};
 			continue;
 		}
 		if(startsWith(lines[i], "^")){
-			sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '^' } );
+			this->sets.back().entries.pb( {i, lines[i].substr(1), &(this->sets.back().categories[curCat]), '^' } );
 			continue;
 		}
 		if(startsWith(lines[i], "!")){
-			sets->back().entries.pb( {i, lines[i].substr(1), &(sets->back().categories[curCat]), '!'} );
+			this->sets.back().entries.pb( {i, lines[i].substr(1), &(this->sets.back().categories[curCat]), '!'} );
 			continue;
 		}
-		sets->back().entries.pb( {i, lines[i], &(sets->back().categories[curCat]) } );
+		this->sets.back().entries.pb( {i, lines[i], &(this->sets.back().categories[curCat]) } );
 	}
-
+	//TODO move to UI
 	cout<<"File read successfully\nPress ENTER to continue\n";
 	getline(cin, curCat);
 	cls();
-
-	return sets;
+	return true;
 }
 
-void sourcefile::update(const vector<set>& sets){
-	for(const set& set : sets){
+void sourcefile::update(){
+	for(const set& set : this->sets){
 		for(const entry& e : set.entries){
 			if(lines[e.lineNum][0] != e.state && e.state>0)
 				lines[e.lineNum] = e.state + lines[e.lineNum];
@@ -211,7 +208,7 @@ void sourcefile::update(const vector<set>& sets){
 void sourcefile::write(){
 	ofstream os(this->path);
 	if(!os){
-		cerr<<"File not found\n"<<this->path;
+		cout<<"File not found\n"<<this->path;
 		return;
 	}
 	for(const string& line : lines){
@@ -222,20 +219,21 @@ void sourcefile::write(){
 	return;
 }
 
-void trainFile(string filepath){
-	sourcefile sf(filepath);
-	sets=sf.read();
-	if(!sets){
-		cerr<<"File not found\n"<<filepath;
-		cls();
-		return;
-	}
+//TODO - remove
+//void trainFile(string filepath){
+//	sourcefile sf(filepath);
+//	sets=sf.read();
+//	if(!sets){
+//		cout<<"File not found\n"<<filepath;
+//		cls();
+//		return;
+//	}
 	//sets=readSetsFromFile(filepath);
 	//train sets
-	for(set &s : *sets)
-		s.train(3);
+//	for(set &s : *sets)
+//		s.train(3);
 	//getline(cin, p_line);
-	sf.update(*sets);	//dynamic updating of data?
-	sf.write();
-	return;
-}
+//	sf.update(*sets);	//dynamic updating of data?
+//	sf.write();
+//	return;
+//}

@@ -10,9 +10,7 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vect);
 
 //UI
 void UIstart();
-std::string askPath();
-
-extern std::string p_line;
+int UIfunction(const std::vector<std::string>& args);
 
 //util
 void cls();
@@ -26,6 +24,6 @@ std::vector<std::string> split(std::string s, const std::string& c);
 
 
 //training
-extern std::vector<set> *sets;
-
-void trainFile(std::string path);
+//extern std::vector<set> *sets;
+//extern std::string filepath;
+extern sourcefile *sf;

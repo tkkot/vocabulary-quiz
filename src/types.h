@@ -47,11 +47,13 @@ public:
 	std::vector<std::string> lines;
 	std::string path;
 
+	std::vector<set> sets;
+
 	sourcefile(std::string path);
 
-	std::vector<set> *read();
+	bool read();
 
-	void update(const std::vector<set>& sets);
+	void update();
 
 	void write();
 };

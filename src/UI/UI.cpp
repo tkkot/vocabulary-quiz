@@ -12,7 +12,7 @@ using namespace std;
 typedef void (*cmd_t)(const vector<string>&);
 
 uint8_t flags;
-string p_line;
+string line;
 
 /// Program util functions
 void f_help(const vector<string>& args){
@@ -36,24 +36,53 @@ void f_noargError(const vector<string>& data){
 }
 /// App functions
 void f_import(const vector<string>& args){
-	vector<string> a = split(args[0], " ");
-	if(a.size()<2)
-		f_noargError({"import"});
-	//quiz.readFile(a[1])
+
+	if(args.size()>1)
+		sf = new sourcefile(args[1]);
+	else{
+		cout<<"Enter path to training file:\n"; //TODO
+		getline(cin, line);
+		trim(line);
+		sf = new sourcefile(line);
+	}
+
+	if(!sf->read()){
+		cout<<"File not found: \n"<<sf->path<<"\n";
+		cls();
+		return;
+	}
+	return;
+}
+void f_train(const vector<string>& args){
+
+	if (!sf | args.size()>1){
+		f_import(args);
+	}
+
+	for(set &s : sf->sets)
+		s.train(3);	//settings as parameter
+	sf->update();	//dynamic updating of data?
+	sf->write();
 }
 
-map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import} };
+map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train} };
 
 
-//Asks user for train file path and return said path
-string askPath(){
-	string path, line;
-	cout<<"Enter path to training file:\n"; //TODO
-	getline(cin, line);
-	trim(line);
-	return line;
+int UIfunction(const vector<string> &args){
+
+	for (const string &i : args)
+		cout<<i<<" ";
+	cout<<endl;
+
+	if(args.size() == 0)
+		return 1;
+	cmd_t c = COMMANDS[args[0]];
+	if(c)
+		c(args);
+	else
+		f_wrongFunc(args);
+	return 0;
 }
-
 
 ///Start UI loop
 void UIstart(){
@@ -61,16 +90,11 @@ void UIstart(){
 	cout<<mes::welcome;
 
 	flags |= 1;
-	string line;
 	cmd_t c;
 	while(flags & 1){
 		getline(cin, line);
 		trim(line);
-		c = COMMANDS[split(line, " ")[0]];
-		if(c)
-			c(split(line, " "));
-		else
-			f_wrongFunc(split(line, " "));
+		UIfunction(split(line, " "));
 	}
 
 	cout<<mes::exit;
