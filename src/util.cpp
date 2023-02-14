@@ -7,10 +7,10 @@ using namespace std;
 #ifdef WIN32
 	#include <windows.h>
 
-	void cls(){ 
+	void cls(){
 	    COORD tl = {0,0};
 	    CONSOLE_SCREEN_BUFFER_INFO s;
-	    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);   
+	    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	    GetConsoleScreenBufferInfo(console, &s);
 	    DWORD written, cells = s.dwSize.X * s.dwSize.Y;
 	    FillConsoleOutputCharacter(console, ' ', cells, tl, &written);
@@ -20,6 +20,7 @@ using namespace std;
 #else
 	void cls(){
 		cout << "\033[2J\033[1;1H";
+		cout << "=============================" << "\n\n";
 	}
 #endif
 

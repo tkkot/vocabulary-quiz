@@ -1,10 +1,8 @@
 #include <iostream>
-#include <fstream>
 #include <cctype>
 #include <ctime>
 
 #include "functions.h"
-#define pb push_back
 
 #ifdef WIN32
 	#include <windows.h>
@@ -23,7 +21,6 @@
 using namespace std;
 
 sourcefile *sf;
-//vector<set> *sets;
 
 int32_t main(int argc, char *argv[]){
 
@@ -41,4 +38,3 @@ int32_t main(int argc, char *argv[]){
 
 	return 0;
 }
-

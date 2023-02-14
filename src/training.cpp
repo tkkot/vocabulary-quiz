@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 entry::entry(int lineNum, const string &line, const category* cat, char state):
 	lineNum(lineNum), cat(cat), state(state){
 
@@ -47,7 +46,6 @@ bool entry::check(const vector<string>& ans){
 	for(ansgroup& i : this->ans){
 		c2=0;
 		for(const string& a : ans){
-//			cout<<a<<" : "<<i.ans<<endl;
 			if(find(i.ans.begin(), i.ans.end(), a) != i.ans.end()){
 				c2=1;
 				c++;
@@ -151,11 +149,11 @@ __START_TRAINING__:
 
 sourcefile::sourcefile(string path) : path(path) {}
 
-bool sourcefile::read(){
+uint8_t sourcefile::read(){
 	string s;
 	ifstream is(this->path);
 	if(!is)
-		return false;
+		return 1;
 	while(getline(is, s)){
 		trim(s);
 		lines.pb(s);
@@ -189,11 +187,7 @@ bool sourcefile::read(){
 		}
 		this->sets.back().entries.pb( {i, lines[i], &(this->sets.back().categories[curCat]) } );
 	}
-	//TODO move to UI
-	cout<<"File read successfully\nPress ENTER to continue\n";
-	getline(cin, curCat);
-	cls();
-	return true;
+	return 0;
 }
 
 void sourcefile::update(){
@@ -205,35 +199,15 @@ void sourcefile::update(){
 	}
 }
 
-void sourcefile::write(){
+uint8_t sourcefile::write(){
 	ofstream os(this->path);
 	if(!os){
-		cout<<"File not found\n"<<this->path;
-		return;
+		return 1;
 	}
 	for(const string& line : lines){
 		os<<line<<'\n';
-		cout<<line<<'\n';
+//		cout<<line<<'\n';
 	}
 	os.close();
-	return;
+	return 0;
 }
-
-//TODO - remove
-//void trainFile(string filepath){
-//	sourcefile sf(filepath);
-//	sets=sf.read();
-//	if(!sets){
-//		cout<<"File not found\n"<<filepath;
-//		cls();
-//		return;
-//	}
-	//sets=readSetsFromFile(filepath);
-	//train sets
-//	for(set &s : *sets)
-//		s.train(3);
-	//getline(cin, p_line);
-//	sf.update(*sets);	//dynamic updating of data?
-//	sf.write();
-//	return;
-//}

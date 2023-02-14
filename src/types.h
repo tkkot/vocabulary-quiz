@@ -51,9 +51,9 @@ public:
 
 	sourcefile(std::string path);
 
-	bool read();
+	uint8_t read();
 
 	void update();
 
-	void write();
+	uint8_t  write();
 };
