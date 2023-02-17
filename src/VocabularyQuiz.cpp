@@ -28,6 +28,7 @@ int32_t main(int argc, char *argv[]){
 
 	//TODO - proper argument parsing
 	if (argc>1){
+		//If no proper function given, just path, automatically import and train that path
 		UIfunction(vector<string>(argv+1, argv+argc));
 	}
 	else

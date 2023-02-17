@@ -9,6 +9,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vect);
 
 //UI
+void UIwait();
 void UIstart();
 int UIfunction(const std::vector<std::string>& args);
 

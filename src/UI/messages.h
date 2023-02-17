@@ -3,7 +3,10 @@ namespace mes{
 #define _S const std::string
 #define _V const std::vector<std::string>
 
+#ifdef __MES_UI__
 	_S welcome = "Welcome to the vocabulary training app thingy (that currently posesses no proper name).\nEnter 'h' for help menu or 'l' to change language\n";
+
+	_S wait = "Press ENTER to continue...";
 
 	//Help messages
 	_S help = std::string("Currently supported commands:\n")+
@@ -37,6 +40,32 @@ namespace mes{
 		"File not found: "};
 	_S err_fnf = "File not found: ";
 
+	_V start_sf = {
+		"Training sets from source file:\n",
+		"\nList of sets in file:\n"};
+	_S fin = "Finished all sets\n";
+#endif
+
+#ifdef __MES_TRAIN__
+
+	_V no_ent = {
+		"No active entries in set: ",
+		" . Skipping.\n"};
+
+	_V err_line = {
+		"Line ",
+		" is not formated correctly:\n"};
+	_V q_train = {
+		"Train set ",
+		"? y/N\n"};
+	_S cor = "Correct\n";
+	_S inc = "Incorrect\n";
+	_S ovr = "Enter override or press ENTER to continue: ";
+	_S ovrd = "OVERRIDEN: ";
+
+	_S set_end = "Finished set. Score:\n";
+
+#endif
 
 #undef _S
 #undef _V

@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <fstream>
 
+#define __MES_TRAIN__
+#include "UI/messages.h"
+
 #define pb push_back
 
 using namespace std;
@@ -12,7 +15,7 @@ entry::entry(int lineNum, const string &line, const category* cat, char state):
 
 	vector<string> s = split(line, ";");
 	if(s.size() != 2) {
-		cout<<"Line "<<lineNum<<" is not formatted correctly:\n"<<line<<'\n';	//TODO move handling to UI
+		cout<<mes::err_line[0]<<lineNum<<mes::err_line[1]<<line<<'\n';	//TODO move handling to UI
 		return;
 	}
 	this->key = s[1];
@@ -72,27 +75,33 @@ set::set(string name) : name(name) {
 
 //settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
 void set::train(uint8_t settings){
-	int correct = 0;
+	string a;	//Placeholder variable for user input
+
+	cls();
+
 	activeEntries = 0;
 	for(entry& e : entries){
 		if(e.state != '^')
 			activeEntries++;
 	}
 
-	if(activeEntries == 0)
-		return;
+	if(activeEntries == 0){
+		cout<<mes::no_ent[0]<<name<<mes::no_ent[1];
+		return;		//TODO flags
+	}
 
-	cout<<"Train set "<<name<<"? y/N\n";
-	string a;
+	cout<<mes::q_train[0]<<name<<mes::q_train[1];	//Train set [name]? y/N\n
+
 	getline(cin, a);
 	trim(a);
+	if(a != "y" & a!="Y")
+		return;
 
-	if(a == "y" || a=="Y")
-		goto __START_TRAINING__;
-	return;
-
-__START_TRAINING__:
 	cls();
+	cout<<"\t"<<name<<"\n\n";
+	int correct = 0;
+
+	//sorting and grouping entries
 	if(settings & 0b00000001){
 		random_shuffle(entries.begin(), entries.end());
 		if(settings & 0b00000010){
@@ -108,11 +117,13 @@ __START_TRAINING__:
 //		for(const entry &e : this->entries){
 //			cout<<e<<endl;
 //		}
+
+
+
 	for(entry &e : this->entries){
 		if(e.state == '^')
 			continue;
-		cout<<this->name<<endl;
-		cout<<e.cat->name<<endl;
+		cout<<e.cat->name<<"\n\n";
 		cout<<e.key<<'\n';
 		bool cr = 0;
 		getline(cin, a);
@@ -121,17 +132,18 @@ __START_TRAINING__:
 		for(string& i : ans)
 			trim(i);
 		cr = e.check(ans);
-		cout<<(cr ? "Correct\n" : "Incorrect\n");
+		cout<<(cr ? mes::cor : mes::inc);
 		for(ansgroup i : e.ans){
 			cout<<i;
 		}
 		cout<<'\n';
 		do{
+			cout<<mes::ovr;
 			getline(cin, a);
 			trim(a);
 			if(a == "!"){
 				cr = !cr;
-				cout<<(cr ? "Correct\n" : "Incorrect\n");
+				cout<<mes::ovrd<<(cr ? mes::cor : mes::inc);
 			}
 			if(a == "!!"){
 				e.state = '!';
@@ -142,8 +154,12 @@ __START_TRAINING__:
 		}while(a != "");
 		correct += cr;
 		cls();
+		cout<<"\t"<<name<<"\n\n";
 	}
-	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n"; getline(cin, a);
+	cout<<mes::set_end;
+	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";
+	UIwait();
+	cls();
 }
 
 

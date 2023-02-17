@@ -5,6 +5,7 @@
 
 #include "../functions.h"
 
+#define __MES_UI__
 #include "messages.h"
 
 using namespace std;
@@ -44,13 +45,11 @@ void f_argError(arg_t data){
 }
 /// App functions
 void f_import(arg_t args){
-	for (const string& i : args)
-		cout<<i<<" ";
-	cout<<endl;
-	if(args.size()>1)
+	if(args.size()>1){
 		sf = new sourcefile(args[1]);
+	}
 	else{
-		cout<<mes::import[0]; //TODO
+		cout<<mes::import[0];
 		getline(cin, line);
 		trim(line);
 		sf = new sourcefile(line);
@@ -63,6 +62,8 @@ void f_import(arg_t args){
 		return;
 	}
 	cout<<mes::import[1];
+	UIwait();
+	cls();
 	return;
 }
 void f_train(arg_t args){
@@ -72,15 +73,29 @@ void f_train(arg_t args){
 	if(!sf)
 		return;
 
+	cout<<mes::start_sf[0]<<sf->path<<mes::start_sf[1];
+	for(int i=0; i<sf->sets.size(); i++)
+		cout<<i<<". "<<sf->sets[i].name<<"\n";
+	UIwait();
+	cls();
+
 	for(set &s : sf->sets)
 		s.train(3);	//settings as parameter
+	cout<<mes::fin;
+
 	sf->update();	//dynamic updating of data?
 	if(sf->write())
 		cout<<mes::err_fnf<<sf->path<<"\n";
+	UIwait();
+	cls();
 }
 
 map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train}, {"c", f_clear} };
 
+void UIwait(){
+	cout<<mes::wait;
+	getline(cin, line);
+}
 
 int UIfunction(const vector<string> &args){
 
