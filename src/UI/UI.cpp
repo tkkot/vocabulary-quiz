@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 typedef void (*cmd_t)(const vector<string>&);	//Funcion pointers to executed commands
 typedef const vector<string> &arg_t;		//Macro for command arguments
 
@@ -20,6 +19,7 @@ string line;	//Container for user input from std::cin
 // Program util functions
 ///Display help message
 void f_help(arg_t args){
+	cls();
 	cout<<mes::help;
 }
 ///Choose language (for now not working)
@@ -88,7 +88,7 @@ void f_train(arg_t args){
 	UIwait();
 
 	for(set &s : sf->sets)
-		s.train(7);	//settings as parameter
+		s.train(par::s);	//settings as parameter
 	cout<<mes::fin;
 
 	sf->update();	//dynamic updating of data?
@@ -102,7 +102,9 @@ void f_settings(arg_t args){
 		f_argError({"s"});
 		return;
 	}
-	//TODO
+	par::s = stoi(args[1], nullptr, 2);
+	cout<<"New settings: "<<0+par::s<<"\n";
+	return;
 }
 
 //Map assigning shortcuts to commands, used to interpret user input

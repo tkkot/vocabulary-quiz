@@ -15,6 +15,17 @@ void UIstart();						//Start UI loop
 int UIfunction(const std::vector<std::string>& args);	//Execute UI function args[0] with arguments args
 extern std::string line;
 
+//console
+uint8_t parse(const std::vector<std::string> &args);
+
+namespace par{
+extern std::vector<bool> flags;//	[T, f, l, s, E]
+
+extern uint8_t s; //settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
+extern std::string l;
+extern std::string f;
+}
+
 //util
 void cls();	//clear screen
 

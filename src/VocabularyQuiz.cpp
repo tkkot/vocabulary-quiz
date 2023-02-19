@@ -47,10 +47,14 @@ int32_t main(int argc, char *argv[]){
 		[-Tf <filepath>]
 			import file from <filepath> and train it
 	*/
-	if (argc>1){
-		UIfunction(vector<string>(argv+1, argv+argc));	//Arguments sent to be interpreted as UI command
-	}
-	else
+
+	parse({argv, argv+argc});
+		//UIfunction(vector<string>(argv+1, argv+argc));
+	if(par::flags[1])
+		UIfunction({"i", par::f});
+	if(par::flags[0]);
+		UIfunction({"t"});
+	if(!par::flags[4])
 		UIstart();	//Start the UI loop
 
 	//Cleanup
