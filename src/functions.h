@@ -13,6 +13,7 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vect);
 void UIwait();						//Wait until user presses ENTER
 void UIstart();						//Start UI loop
 int UIfunction(const std::vector<std::string>& args);	//Execute UI function args[0] with arguments args
+extern std::string line;
 
 //util
 void cls();	//clear screen

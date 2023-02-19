@@ -36,7 +36,7 @@ void f_exit(arg_t args){
 }
 //Errors
 ///Display error message for unknown command
-void f_wrongFunc(arg_t& func){
+void f_wrongFunc(arg_t func){
 	cout<<mes::err_com[0]<<func[0]<<mes::err_com[1]<<endl;
 }
 ///Display error message for wrong arguments for function (or lack of them)
@@ -97,9 +97,16 @@ void f_train(arg_t args){
 	UIwait();
 	cls();
 }
+void f_settings(arg_t args){
+	if(args.size()<2){	//TODO ask user for specifying settings
+		f_argError({"s"});
+		return;
+	}
+	//TODO
+}
 
 //Map assigning shortcuts to commands, used to interpret user input
-map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train}, {"c", f_clear} };
+map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train}, {"c", f_clear}, {"s", f_settings} };
 
 //Wait until user presses ENTER
 void UIwait(){

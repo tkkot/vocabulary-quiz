@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
+#include <queue>
 
 #define __MES_TRAIN__	//Only messages used in this file will be loaded
 #include "UI/messages.h"
@@ -91,6 +92,50 @@ set::set(string name) : name(name) {
 	categories["default"] = {0, "default"};
 }
 
+bool processEntry(entry& e, queue<entry*> &wrng, string &name){
+	if(e.state == '^')
+		return 0;
+	
+	//Ask question and request answer
+	cout<<e.cat->name<<"\n\n";
+	cout<<e.key<<'\n';
+	bool cr = 0;
+	getline(cin, line);
+
+	//Process answer
+	vector<string> ans = split(line, ",");
+	for(string& i : ans)
+		trim(i);
+	cr = e.check(ans);
+	
+	//Respond to user
+	cout<<(cr ? mes::cor : mes::inc);
+	for(ansgroup i : e.ans)
+		cout<<i;
+	cout<<'\n';
+	
+	//Ask for override
+	do{
+		cout<<mes::ovr;
+		getline(cin, line);
+		trim(line);
+		if(line == "!"){
+			cr = !cr;
+			cout<<mes::ovrd<<(cr ? mes::cor : mes::inc);
+		}
+		if(line == "!!")
+			e.state = '!';
+		if(line == "^")
+			e.state = '^';
+
+	}while(line != "");
+	if (!cr)
+		wrng.push(&e);
+	cls();
+	cout<<"\t"<<name<<"\n\n";
+	return cr;
+}
+
 /*
  * Train this set.
  * settings:
@@ -99,8 +144,6 @@ set::set(string name) : name(name) {
  * 	b2 - repeat wrongs - should wrong answers be repeated after training ends?
  */
 void set::train(uint8_t settings){
-	string a;	//Placeholder variable for user input
-
 	cls();
 
 	//Count trainable entries in set
@@ -116,19 +159,20 @@ void set::train(uint8_t settings){
 
 	//Ask user whether to train this set
 	cout<<mes::q_train[0]<<name<<mes::q_train[1];	//Train set [name]? y/N\n
-	getline(cin, a);
-	trim(a);
-	if(a != "y" & a!="Y")
+
+	getline(cin, line);
+	trim(line);
+	if(line != "y" & line!="Y")
 		return;
 
 	cls();
 	cout<<"\t"<<name<<"\n\n";
 	int correct = 0;
 
-	//sorting and grouping entries
-	if(settings & 0b00000001){
+	//sorting/randomizing and grouping entries
+	if(settings & 1){	//Randomize
 		random_shuffle(entries.begin(), entries.end());
-		if(settings & 0b00000010){
+		if(settings & 2){	//Group terms
 			sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
 				return a.cat->num<b.cat->num;
 			});
@@ -139,51 +183,22 @@ void set::train(uint8_t settings){
 			return a.lineNum<b.lineNum;
 		});
 
+	queue<entry*> wrng;
+
 	//TRAINING
 	for(entry &e : this->entries){
-		if(e.state == '^')
-			continue;
-
-		//Ask question and request answer
-		cout<<e.cat->name<<"\n\n";
-		cout<<e.key<<'\n';
-		bool cr = 0;
-		getline(cin, a);
-
-		//Process answer
-		vector<string> ans = split(a, ",");
-		for(string& i : ans)
-			trim(i);
-		cr = e.check(ans);
-
-		//Respond to user
-		cout<<(cr ? mes::cor : mes::inc);
-		for(ansgroup i : e.ans){
-			cout<<i;
-		}
-		cout<<'\n';
-
-		//Ask for override
-		do{
-			cout<<mes::ovr;
-			getline(cin, a);
-			trim(a);
-			if(a == "!"){
-				cr = !cr;
-				cout<<mes::ovrd<<(cr ? mes::cor : mes::inc);
-			}
-			if(a == "!!"){
-				e.state = '!';
-			}
-			if(a == "^")
-				e.state = '^';
-
-		}while(a != "");
-
-		correct += cr;
-		cls();
-		cout<<"\t"<<name<<"\n\n";
+		correct+=processEntry(e, wrng, name);
 	}
+
+	if(settings & 4){	//repeat wrongs
+		entry* e;
+		while(!wrng.empty()){
+			e=wrng.front();
+			processEntry(*e, wrng, name);
+			wrng.pop();
+		}
+	}
+
 	cout<<mes::set_end;
 	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";	//Calculating score on set
 	UIwait();
