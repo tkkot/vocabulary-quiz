@@ -7,16 +7,19 @@
 
 //Training types
 
+//User-defined entry category
 struct category{
 	int num;
 	std::string name;
 };
 
+//One set of answers, mutually alternative
 struct ansgroup{
 	uint8_t type;	// 0 - mandatory, '*' - not-mandatory, '-' - ending
 	std::vector<std::string> ans;
 };
 
+//A single entry, or line in sourcefile - key and answer
 struct entry{
 	char state;
 	int lineNum;
@@ -29,6 +32,7 @@ struct entry{
 	bool check(const std::vector<std::string>& ans);
 };
 
+//A set of entries grouped in categories
 class set{
 public:
 	std::string name;
@@ -42,6 +46,7 @@ public:
 	void train(uint8_t settings = 0b00000000);
 };
 
+//One file from which sets are read
 class sourcefile{
 public:
 	std::vector<std::string> lines;

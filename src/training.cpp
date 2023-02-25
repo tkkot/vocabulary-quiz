@@ -3,31 +3,42 @@
 #include <algorithm>
 #include <fstream>
 
-#define __MES_TRAIN__
+#define __MES_TRAIN__	//Only messages used in this file will be loaded
 #include "UI/messages.h"
 
-#define pb push_back
+#define pb push_back	//vector macro
 
 using namespace std;
 
+//Defining functions declared in "types.h" and "functions.h"
+
+/* Constructor for entry
+ *
+ * lineNum - number of line in sourcefile, used when writing
+ * line - raw text input from sourcefile
+ * cat - entry's category
+ * state - state to set for entry (read from sourcefile)
+ */
 entry::entry(int lineNum, const string &line, const category* cat, char state):
 	lineNum(lineNum), cat(cat), state(state){
 
-	vector<string> s = split(line, ";");
-	if(s.size() != 2) {
-		cout<<mes::err_line[0]<<lineNum<<mes::err_line[1]<<line<<'\n';	//TODO move handling to UI
+	vector<string> s = split(line, ";");	//Split line into two halves by ';' separator
+	if(s.size() != 2) {	//Line should be split into two parts, if not there is a formatting mistake
+		cout<<mes::err_line[0]<<lineNum<<mes::err_line[1]<<line<<'\n';
 		return;
 	}
-	this->key = s[1];
+	this->key = s[1];	//The second half of the line is the key (word / phrase asked to the user)
 	trim(this->key);
 
-	s = split(s[0], ",");
+	s = split(s[0], ",");	//The first half of the line is the accepted answers, which are aplit by ','
 	for(string& i : s){
 		trim(i);
-		if(startsWith(i, "|"))
+		//Testing for answer types
+		if(startsWith(i, "|"))	//If answer alternative to previous, add it to previous ansgroup
 			this->ans.back().ans.pb(i.substr(1));
-		else{
+		else{	//Else create new ansgroup
 			this->ans.pb(ansgroup());
+			//Set ansgroup type
 			if(startsWith(i, "*")){
 				this->ans.back().type='*';
 				i=i.substr(1);
@@ -38,14 +49,19 @@ entry::entry(int lineNum, const string &line, const category* cat, char state):
 			}
 			else
 				this->ans.back().type=0;
-			this->ans.back().ans.pb(i);
+			this->ans.back().ans.pb(i);	//Add cyrrent answer to newly made ansgroup
 		}
 	}
 }
 
+/*
+ * Check whether answer ans matches this entry
+ * Answer string should contain every mandatory (default) answer and no wrong (not matching) answers
+ * 
+ */
 bool entry::check(const vector<string>& ans){
 	bool c1 = 0, c2;
-	int c=0;
+	int c=0;	//counts how many strings in ans match a correct answer in the entry
 	for(ansgroup& i : this->ans){
 		c2=0;
 		for(const string& a : ans){
@@ -68,30 +84,38 @@ bool entry::check(const vector<string>& ans){
 }
 
 
-
+/*
+ * Constructor for set
+ */
 set::set(string name) : name(name) {
 	categories["default"] = {0, "default"};
 }
 
-//settings: b0 - randomize; b1 - group terms; b2 - repeat wrongs;
+/*
+ * Train this set.
+ * settings:
+ *	b0 - randomize - should entries be randomized?
+ *	b1 - group entries - should entries from the same category be grouped together (after being randomized)?
+ * 	b2 - repeat wrongs - should wrong answers be repeated after training ends?
+ */
 void set::train(uint8_t settings){
 	string a;	//Placeholder variable for user input
 
 	cls();
 
+	//Count trainable entries in set
 	activeEntries = 0;
 	for(entry& e : entries){
 		if(e.state != '^')
 			activeEntries++;
 	}
-
 	if(activeEntries == 0){
 		cout<<mes::no_ent[0]<<name<<mes::no_ent[1];
 		return;		//TODO flags
 	}
 
+	//Ask user whether to train this set
 	cout<<mes::q_train[0]<<name<<mes::q_train[1];	//Train set [name]? y/N\n
-
 	getline(cin, a);
 	trim(a);
 	if(a != "y" & a!="Y")
@@ -114,29 +138,32 @@ void set::train(uint8_t settings){
 		sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
 			return a.lineNum<b.lineNum;
 		});
-//		for(const entry &e : this->entries){
-//			cout<<e<<endl;
-//		}
 
-
-
+	//TRAINING
 	for(entry &e : this->entries){
 		if(e.state == '^')
 			continue;
+
+		//Ask question and request answer
 		cout<<e.cat->name<<"\n\n";
 		cout<<e.key<<'\n';
 		bool cr = 0;
 		getline(cin, a);
 
+		//Process answer
 		vector<string> ans = split(a, ",");
 		for(string& i : ans)
 			trim(i);
 		cr = e.check(ans);
+
+		//Respond to user
 		cout<<(cr ? mes::cor : mes::inc);
 		for(ansgroup i : e.ans){
 			cout<<i;
 		}
 		cout<<'\n';
+
+		//Ask for override
 		do{
 			cout<<mes::ovr;
 			getline(cin, a);
@@ -152,34 +179,40 @@ void set::train(uint8_t settings){
 				e.state = '^';
 
 		}while(a != "");
+
 		correct += cr;
 		cls();
 		cout<<"\t"<<name<<"\n\n";
 	}
 	cout<<mes::set_end;
-	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";
+	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";	//Calculating score on set
 	UIwait();
 	cls();
 }
 
-
+///Constructor for sourcefile
 sourcefile::sourcefile(string path) : path(path) {}
 
+/*
+ * Read this sourcefile and parse sets
+ */
 uint8_t sourcefile::read(){
 	string s;
+	//Open file
 	ifstream is(this->path);
 	if(!is)
 		return 1;
+	//Read and close file
 	while(getline(is, s)){
 		trim(s);
 		lines.pb(s);
 	}
 	is.close();
 
-	this->sets.pb({"default"});
+	//PARSE FILE
+	this->sets.pb({"default"});	//Create default set		TODO: only if not specufied
 	string curCat;
 	for(int i=0; i<lines.size(); i++){
-//			clog<<i<<' '<<lines[i]<<'\n';
 		if(lines[i].empty())
 			continue;
 		if(startsWith(lines[i], "#"))
@@ -206,6 +239,9 @@ uint8_t sourcefile::read(){
 	return 0;
 }
 
+/*
+ * Update raw sourcefile with data from program
+ */
 void sourcefile::update(){
 	for(const set& set : this->sets){
 		for(const entry& e : set.entries){
@@ -215,6 +251,9 @@ void sourcefile::update(){
 	}
 }
 
+/*
+ * Write raw source to file
+ */
 uint8_t sourcefile::write(){
 	ofstream os(this->path);
 	if(!os){
@@ -222,7 +261,6 @@ uint8_t sourcefile::write(){
 	}
 	for(const string& line : lines){
 		os<<line<<'\n';
-//		cout<<line<<'\n';
 	}
 	os.close();
 	return 0;

@@ -4,9 +4,11 @@
 
 #include "functions.h"
 
+//Platform-dependent functions
 #ifdef WIN32
 	#include <windows.h>
 
+	//initialize randomizer
 	void init(){
 		srand(time(0));
 //		system("chcp 65001");
@@ -20,20 +22,21 @@
 
 using namespace std;
 
+//Currently imported file
 sourcefile *sf;
 
 int32_t main(int argc, char *argv[]){
 
 	init();
 
-	//TODO - proper argument parsing
+	//Temporary argument parsing
 	if (argc>1){
-		//If no proper function given, just path, automatically import and train that path
-		UIfunction(vector<string>(argv+1, argv+argc));
+		UIfunction(vector<string>(argv+1, argv+argc));	//Arguments sent to be interpreted as UI command
 	}
 	else
-		UIstart();
+		UIstart();	//Start the UI loop
 
+	//Cleanup
 	if (sf)
 		delete sf;
 

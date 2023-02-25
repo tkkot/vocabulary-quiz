@@ -10,29 +10,36 @@
 
 using namespace std;
 
-typedef void (*cmd_t)(const vector<string>&);
-typedef const vector<string> &arg_t;
 
-uint8_t flags;
-string line;
+typedef void (*cmd_t)(const vector<string>&);	//Funcion pointers to executed commands
+typedef const vector<string> &arg_t;		//Macro for command arguments
 
-/// Program util functions
+uint8_t flags;	//Program flags (for now only [0]=running)
+string line;	//Container for user input from std::cin
+
+// Program util functions
+///Display help message
 void f_help(arg_t args){
 	cout<<mes::help;
 }
+///Choose language (for now not working)
 void f_lang(arg_t args){
 	cout<<mes::lang;
 }
+///Call the clean screen function
 void f_clear(arg_t args){
 	cls();
 }
+///Set running flag to 0, exit program
 void f_exit(arg_t args){
 	flags &= 0B11111110;
 }
-///Errors
+//Errors
+///Display error message for unknown command
 void f_wrongFunc(arg_t& func){
 	cout<<mes::err_com[0]<<func[0]<<mes::err_com[1]<<endl;
 }
+///Display error message for wrong arguments for function (or lack of them)
 void f_argError(arg_t data){
 	if(data.size()>1){
 		cout<<mes::err_arg[0];
@@ -43,7 +50,8 @@ void f_argError(arg_t data){
 	else
 		cout<<mes::err_arg[2]<<data[0]<<mes::err_arg[3]<<mes::err_arg[4];
 }
-/// App functions
+// App functions
+///Open sourcefile and import sets from it
 void f_import(arg_t args){
 	if(args.size()>1){
 		sf = new sourcefile(args[1]);
@@ -66,6 +74,7 @@ void f_import(arg_t args){
 	cls();
 	return;
 }
+///Train current sets
 void f_train(arg_t args){
 
 	if (!sf | args.size()>1)
@@ -90,13 +99,18 @@ void f_train(arg_t args){
 	cls();
 }
 
+//Map assigning shortcuts to commands, used to interpret user input
 map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train}, {"c", f_clear} };
 
+//Wait until user presses ENTER
 void UIwait(){
 	cout<<mes::wait;
 	getline(cin, line);
 }
 
+/*
+ * Execute function args[0] with parameter args
+ */
 int UIfunction(const vector<string> &args){
 
 	if(args.size() == 0)

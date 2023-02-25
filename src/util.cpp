@@ -4,9 +4,11 @@
 #include <algorithm>
 using namespace std;
 
+//Platform-specific functions
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 	#include <windows.h>
 
+	//Cleaning screen on windows (code from the internet somewhere)
 	void cls(){
 		COORD tl = {0,0};
 		CONSOLE_SCREEN_BUFFER_INFO s;
@@ -19,12 +21,14 @@ using namespace std;
 		cout << "=============================" << "\n\n";
 	}
 #else
+	//Cleaning terminal (Also  from internet)
 	void cls(){
 		cout << "\033[2J\033[1;1H";
 		cout << "=============================" << "\n\n";
 	}
 #endif
 
+///Outputting vectors with stream
 template<typename T>
 ostream& operator<<(ostream& stream, const vector<T>& vect){
 	for(const T& i : vect){
@@ -34,6 +38,7 @@ ostream& operator<<(ostream& stream, const vector<T>& vect){
 	return stream;
 }
 
+//Remove whitespaces from beginning and end of string s
 void trim(string &s){
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
         return !std::isspace(ch);
@@ -42,15 +47,18 @@ void trim(string &s){
         return !std::isspace(ch);
     }).base(), s.end());
 }
+//Same as trim, but copies string rather than referencing
 string trim_c(string s){
 	trim(s);
 	return s;
 }
 
+//Checks if string starts with prefix
 bool startsWith(const string& s, const string& prefix){
 	return prefix == s.substr(0, prefix.size());
 }
 
+//Split string into vector of strings by c
 vector<string> split(string s, const string& c){
 	int i=0;
 	vector<string> v;
@@ -62,6 +70,7 @@ vector<string> split(string s, const string& c){
 	return v;
 }
 
+//For streaming ansgroups
 ostream& operator<<(ostream& stream, const ansgroup& a){
 	if(a.type == '*')
 		stream<<'*';
@@ -72,6 +81,7 @@ ostream& operator<<(ostream& stream, const ansgroup& a){
 		stream<<'|'<<a.ans[i]<<", ";
 	return stream;
 }
+//For streaming entries
 ostream& operator<<(ostream& stream, const entry& e){
 	stream<<e.lineNum<<' '<<e.cat->name<<": "<<e.key<<"; ";
 	for(ansgroup i : e.ans)
