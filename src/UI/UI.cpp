@@ -89,7 +89,7 @@ void f_train(arg_t args){
 	cls();
 
 	for(set &s : sf->sets)
-		s.train(3);	//settings as parameter
+		s.train(7);	//settings as parameter
 	cout<<mes::fin;
 
 	sf->update();	//dynamic updating of data?
