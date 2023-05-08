@@ -12,7 +12,7 @@
 	void init(){
 		srand(time(0));
 		SetConsoleOutputCP(CP_UTF8);
-		setvbuf(stdout, nullptr, _IOFBF, 1000);		//Is it needed??? A fix for a VS bug. Might cause issues?
+//		setvbuf(stdout, nullptr, _IOFBF, 1000);		//Is it needed??? A fix for a VS bug. Might cause issues?
 	}
 
 #else
