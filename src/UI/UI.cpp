@@ -86,7 +86,6 @@ void f_train(arg_t args){
 	for(int i=0; i<sf->sets.size(); i++)
 		cout<<i<<". "<<sf->sets[i].name<<"\n";
 	UIwait();
-	cls();
 
 	for(set &s : sf->sets)
 		s.train(7);	//settings as parameter

@@ -3,4 +3,4 @@ $tests
 #COMMENT
 
 t1, t2;		a1
-!g1, g2; a2
+!g1, g2; ą2

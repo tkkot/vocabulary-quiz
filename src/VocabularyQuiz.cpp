@@ -5,13 +5,14 @@
 #include "functions.h"
 
 //Platform-dependent functions
-#ifdef WIN32
+#ifdef _WIN32
 	#include <windows.h>
 
 	//initialize randomizer
 	void init(){
 		srand(time(0));
-//		system("chcp 65001");
+		SetConsoleOutputCP(CP_UTF8);
+		setvbuf(stdout, nullptr, _IOFBF, 1000);		//Is it needed??? A fix for a VS bug. Might cause issues?
 	}
 
 #else
