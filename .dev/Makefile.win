@@ -5,8 +5,8 @@ CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
 RES      = ../bin/Windows/obj/VocabularyQuiz_private.res
-OBJ      = ../bin/Windows/obj/training.o ../bin/Windows/obj/util.o ../bin/Windows/obj/VocabularyQuiz.o ../bin/Windows/obj/parser.o ../bin/Windows/obj/UI.o ../bin/Windows/obj/test2.o $(RES)
-LINKOBJ  = ../bin/Windows/obj/training.o ../bin/Windows/obj/util.o ../bin/Windows/obj/VocabularyQuiz.o ../bin/Windows/obj/parser.o ../bin/Windows/obj/UI.o ../bin/Windows/obj/test2.o $(RES)
+OBJ      = ../bin/Windows/obj/training.o ../bin/Windows/obj/util.o ../bin/Windows/obj/VocabularyQuiz.o ../bin/Windows/obj/parser.o ../bin/Windows/obj/UI.o $(RES)
+LINKOBJ  = ../bin/Windows/obj/training.o ../bin/Windows/obj/util.o ../bin/Windows/obj/VocabularyQuiz.o ../bin/Windows/obj/parser.o ../bin/Windows/obj/UI.o $(RES)
 LIBS     = -L"D:/Software/System/Dev-Cpp/MinGW64/lib" -L"D:/Software/System/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc
 INCS     = -I"D:/Software/System/Dev-Cpp/MinGW64/include" -I"D:/Software/System/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/Software/System/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/12.2.0/include"
 CXXINCS  = -I"D:/Software/System/Dev-Cpp/MinGW64/include" -I"D:/Software/System/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/Software/System/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/12.2.0/include"
@@ -39,9 +39,6 @@ $(BIN): $(OBJ)
 
 ../bin/Windows/obj/UI.o: ../src/UI/UI.cpp
 	$(CPP) -c ../src/UI/UI.cpp -o ../bin/Windows/obj/UI.o $(CXXFLAGS)
-
-../bin/Windows/obj/test2.o: ../src/testing/test2.cpp
-	$(CPP) -c ../src/testing/test2.cpp -o ../bin/Windows/obj/test2.o $(CXXFLAGS)
 
 ../bin/Windows/obj/VocabularyQuiz_private.res: VocabularyQuiz_private.rc 
 	$(WINDRES) -i VocabularyQuiz_private.rc --input-format=rc -o ../bin/Windows/obj/VocabularyQuiz_private.res -O coff 

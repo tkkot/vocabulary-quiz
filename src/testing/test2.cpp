@@ -1,15 +1,20 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <Windows.h>
 #include <cstdio>
+
+#ifdef WIN32
+	#include <Windows.h>
+#endif
 
 int main(){
 	std::string str;
-	
+
+#ifdef WIN32
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IOFBF, 1000);		//Is it needed??? A fix for a VS bug. Might cause issues?
-	
+#endif
+
 	{	//Console (iostream)
 		std::getline(std::cin, str);
 		std::cout<<str<<std::endl;
