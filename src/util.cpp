@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-using namespace std;
 
 //Platform-specific functions
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
@@ -18,15 +17,17 @@ using namespace std;
 		FillConsoleOutputCharacter(console, ' ', cells, tl, &written);
 		FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
 		SetConsoleCursorPosition(console, tl);
-		cout << "=============================" << "\n\n";
+		std::cout << "=============================" << "\n\n";
 	}
 #else
 	//Cleaning terminal (Also  from internet)
 	void cls(){
-		cout << "\033[2J\033[1;1H";
-		cout << "=============================" << "\n\n";
+		std::cout << "\033[2J\033[1;1H";
+		std::cout << "=============================" << "\n\n";
 	}
 #endif
+
+using namespace std;	//Must be included AFTER windows.h, or it messes up (conflict between std::byte and definition of byte in header)
 
 ///Outputting vectors with stream
 template<typename T>
