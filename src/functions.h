@@ -4,10 +4,24 @@
 
 //Output
 //Util stuff - streaming containers and structs
-std::ostream& operator<<(std::ostream& stream, const ansgroup& a);
 std::ostream& operator<<(std::ostream& stream, const entry& e);
 template<typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vect);
+
+/**
+ *  UI command interface:
+ *      each UI implementation should... well implement these
+ */
+class UI{
+public:
+//Temporary UI stuff, in lieu of proper interface
+   virtual void writeText(const std::string& text)=0;
+   virtual void writeText(std::initializer_list<std::string> text)=0;
+   virtual std::string readLine()=0;
+   virtual void cls()=0;   //clear screen
+};
+
+extern UI &ui;
 
 //Globally accessible UI functions
 void UIwait();						//Wait until user presses ENTER
@@ -25,9 +39,6 @@ extern uint8_t s; //settings: b0 - randomize; b1 - group terms; b2 - repeat wron
 extern std::string l;
 extern std::string f;
 }
-
-//util
-void cls();	//clear screen
 
 //Text functions
 void trim(std::string &s);

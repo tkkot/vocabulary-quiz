@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+
 if (CMAKE_BUILD_TYPE STREQUAL "")
     # Build type is not set eg. command was "cmake .."
     message(STATUS "  Diag: Build type was unspecified, set to Release")
@@ -29,6 +31,8 @@ project(vocabularyQuiz)
 file (GLOB_RECURSE VOCAB_SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 
 add_executable(vocabularyQuiz ${VOCAB_SOURCES})
+
+target_include_directories(vocabularyQuiz PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 set_target_properties(vocabularyQuiz 
     PROPERTIES

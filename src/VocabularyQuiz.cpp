@@ -2,7 +2,8 @@
 #include <cctype>
 #include <ctime>
 
-#include "functions.h"
+// #include <functions.h>
+#include <UI/consoleUI.h>
 
 //Platform-dependent functions
 #ifdef _WIN32
@@ -21,10 +22,22 @@
 	}
 #endif
 
-using namespace std;
-
 //Currently imported file
 sourcefile *sf;
+
+std::vector<set> setCache;
+
+
+/**
+ *	Desing principles:
+ *		Backend functions indepentent from frontend
+ *		Backend has control, sends commands to frontend, which is responsible
+ *	   for their implementation.
+ *		
+*/
+
+consoleUI test;
+UI &ui = test;
 
 int32_t main(int argc, char *argv[]){
 

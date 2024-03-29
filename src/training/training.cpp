@@ -1,17 +1,32 @@
-#include "functions.h"
+#include <functions.h>
 #include <iostream>
 #include <algorithm>
 #include <fstream>
 #include <queue>
+#include <ctime>
+#include <random>
 
 #define __MES_TRAIN__	//Only messages used in this file will be loaded
-#include "UI/messages.h"
+#include <UI/messages.h>
 
 #define pb push_back	//vector macro
 
 using namespace std;
 
 //Defining functions declared in "types.h" and "functions.h"
+
+ansgroup::operator std::string(){
+	string s;
+	if(type == '*')
+		s+='*';
+	else if(type == '-')
+		s+='-';
+	s+=ans[0]+", ";
+	for(int i =1; i<ans.size(); i++)
+		s+='|'+ans[i]+", ";
+	return s;
+}
+
 
 /* Constructor for entry
  *
@@ -25,7 +40,7 @@ entry::entry(int lineNum, const string &line, const category* cat, char state):
 
 	vector<string> s = split(line, ";");	//Split line into two halves by ';' separator
 	if(s.size() != 2) {	//Line should be split into two parts, if not there is a formatting mistake
-		cout<<mes::err_line[0]<<lineNum<<mes::err_line[1]<<line<<'\n';
+		ui.writeText({mes::err_line[0], to_string(lineNum), mes::err_line[1], line, "\n"});
 		return;
 	}
 	this->key = s[1];	//The second half of the line is the key (word / phrase asked to the user)
@@ -93,14 +108,15 @@ set::set(string name) : name(name) {
 }
 
 bool processEntry(entry& e, queue<entry*> &wrng, string &name){
+	string line;
 	if(e.state == '^')
 		return 0;
 	
 	//Ask question and request answer
-	cout<<e.cat->name<<"\n\n";
-	cout<<e.key<<'\n';
+	ui.writeText({e.cat->name, "\n\n"});
+	ui.writeText({e.key, "\n"});
 	bool cr = 0;
-	getline(cin, line);
+	line = ui.readLine();
 
 	//Process answer
 	vector<string> ans = split(line, ",");
@@ -108,20 +124,23 @@ bool processEntry(entry& e, queue<entry*> &wrng, string &name){
 		trim(i);
 	cr = e.check(ans);
 	
+
+	
 	//Respond to user
-	cout<<(cr ? mes::cor : mes::inc);
-	for(ansgroup i : e.ans)
-		cout<<i;
-	cout<<'\n';
+	ui.writeText((cr ? mes::cor : mes::inc));
+	for(ansgroup i : e.ans){
+		ui.writeText(i);
+	}
+	ui.writeText("\n");
 	
 	//Ask for override
 	do{
-		cout<<mes::ovr;
-		getline(cin, line);
+		ui.writeText(mes::ovr);
+		line = ui.readLine();
 		trim(line);
 		if(line == "!"){
 			cr = !cr;
-			cout<<mes::ovrd<<(cr ? mes::cor : mes::inc);
+				ui.writeText({mes::ovrd, (cr ? mes::cor : mes::inc)});
 		}
 		if(line == "!!")
 			e.state = '!';
@@ -131,8 +150,8 @@ bool processEntry(entry& e, queue<entry*> &wrng, string &name){
 	}while(line != "");
 	if (!cr)
 		wrng.push(&e);
-	cls();
-	cout<<"\t"<<name<<"\n\n";
+	ui.cls();
+	ui.writeText({"\t", name, "\n\n"});
 	return cr;
 }
 
@@ -144,8 +163,9 @@ bool processEntry(entry& e, queue<entry*> &wrng, string &name){
  * 	b2 - repeat wrongs - should wrong answers be repeated after training ends?
  */
 void set::train(uint8_t settings){
-	cls();
+	string a;	//Placeholder variable for user input
 
+	ui.cls();
 	//Count trainable entries in set
 	activeEntries = 0;
 	for(entry& e : entries){
@@ -153,26 +173,25 @@ void set::train(uint8_t settings){
 			activeEntries++;
 	}
 	if(activeEntries == 0){
-		cout<<mes::no_ent[0]<<name<<mes::no_ent[1];
+		ui.writeText({mes::no_ent[0], name, mes::no_ent[1]});
 		return;		//TODO flags
 	}
 
 	//Ask user whether to train this set
-	cout<<mes::q_train[0]<<name<<mes::q_train[1];	//Train set [name]? y/N\n
-
-	getline(cin, line);
-	trim(line);
-	if(line != "y" & line!="Y")
+	ui.writeText({mes::q_train[0], name, mes::q_train[1]});	//Train set [name]? y/N\n
+	a = ui.readLine();
+	trim(a);
+	if(a != "y" & a!="Y")
 		return;
 
-	cls();
-	cout<<"\t"<<name<<"\n\n";
+	ui.cls();
+	ui.writeText({"\t", name, "\n\n"});
 	int correct = 0;
 
-	//sorting/randomizing and grouping entries
-	if(settings & 1){	//Randomize
-		random_shuffle(entries.begin(), entries.end());
-		if(settings & 2){	//Group terms
+	//sorting and grouping entries
+	if(settings & 0b00000001){
+		shuffle(entries.begin(), entries.end(), default_random_engine(time(0)));
+		if(settings & 0b00000010){
 			sort(entries.begin(), entries.end(), [](const entry& a, const entry& b){
 				return a.cat->num<b.cat->num;
 			});
@@ -187,6 +206,7 @@ void set::train(uint8_t settings){
 
 	//TRAINING
 	for(entry &e : this->entries){
+// <<<<<<< HEAD:src/training.cpp
 		correct+=processEntry(e, wrng, name);
 	}
 
@@ -199,10 +219,57 @@ void set::train(uint8_t settings){
 		}
 	}
 
-	cout<<mes::set_end;
+/*	cout<<mes::set_end;
 	cout<<correct<<" / "<<activeEntries<<" : "<<(activeEntries ? to_string(100 * correct / activeEntries) : "~")<<"%\n";	//Calculating score on set
+=======
+		if(e.state == '^')
+			continue;
+
+		//Ask question and request answer
+		ui.writeText({e.cat->name, "\n\n"});
+		ui.writeText({e.key, "\n"});
+		bool cr = 0;
+		a = ui.readLine();
+
+		//Process answer
+		vector<string> ans = split(a, ",");
+		for(string& i : ans)
+			trim(i);
+		cr = e.check(ans);
+
+		//Respond to user
+		ui.writeText((cr ? mes::cor : mes::inc));
+		for(ansgroup i : e.ans){
+			ui.writeText(i);
+		}
+		ui.writeText("\n");
+
+		//Ask for override
+		do{
+			ui.writeText(mes::ovr);
+			a = ui.readLine();
+			trim(a);
+			if(a == "!"){
+				cr = !cr;
+				ui.writeText({mes::ovrd, (cr ? mes::cor : mes::inc)});
+			}
+			if(a == "!!"){
+				e.state = '!';
+			}
+			if(a == "^")
+				e.state = '^';
+
+		}while(a != "");
+
+		correct += cr;
+		ui.cls();
+		ui.writeText({"\t", name, "\n\n"});
+	}*/
+	ui.writeText(mes::set_end);
+	ui.writeText({to_string(correct), " / ", to_string(activeEntries), " : ", (activeEntries ? to_string(100 * correct / activeEntries) : "~"), "%\n"});	//Calculating score on set
+//>>>>>>> 2ea5261 (Separated UI from backend):src/training/training.cpp
 	UIwait();
-	cls();
+	ui.cls();
 }
 
 ///Constructor for sourcefile

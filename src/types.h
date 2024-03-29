@@ -18,6 +18,7 @@ struct category{
 struct ansgroup{
 	uint8_t type;	// 0 - mandatory, '*' - not-mandatory, '-' - ending
 	std::vector<std::string> ans;
+	operator std::string();
 };
 
 //A single entry, or line in sourcefile - key and answer

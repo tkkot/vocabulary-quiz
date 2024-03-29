@@ -3,12 +3,53 @@
 #include <vector>
 #include <functional>
 
-#include "../functions.h"
+#include <functions.h>
+#include "consoleUI.h"
 
 #define __MES_UI__
 #include "messages.h"
 
+
+//Platform-specific functions
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+	#include <windows.h>
+
+	//Cleaning screen on windows (code from the internet somewhere)
+	void consoleUI::cls(){
+		COORD tl = {0,0};
+		CONSOLE_SCREEN_BUFFER_INFO s;
+		HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+		GetConsoleScreenBufferInfo(console, &s);
+		DWORD written, cells = s.dwSize.X * s.dwSize.Y;
+		FillConsoleOutputCharacter(console, ' ', cells, tl, &written);
+		FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
+		SetConsoleCursorPosition(console, tl);
+		std::cout << "=============================" << "\n\n";
+	}
+#else
+	//Cleaning terminal (Also  from internet)
+	void consoleUI::cls(){
+		std::cout << "\033[2J\033[1;1H";
+		std::cout << "=============================" << "\n\n";
+	}
+#endif
+
 using namespace std;
+
+void consoleUI::writeText(const string& text){
+	cout<<text;
+}
+void consoleUI::writeText(std::initializer_list<std::string> text){
+	for (string i : text){
+		ui.writeText(i);
+	}
+};
+string consoleUI::readLine(){
+	string line;
+	getline(cin, line);
+	return line;
+}
+
 
 typedef void (*cmd_t)(const vector<string>&);	//Funcion pointers to executed commands
 typedef const vector<string> &arg_t;		//Macro for command arguments
@@ -16,19 +57,20 @@ typedef const vector<string> &arg_t;		//Macro for command arguments
 uint8_t flags;	//Program flags (for now only [0]=running)
 string line;	//Container for user input from std::cin
 
+
 // Program util functions
 ///Display help message
 void f_help(arg_t args){
-	cls();
-	cout<<mes::help;
+	ui.cls();
+	ui.writeText(mes::help);
 }
 ///Choose language (for now not working)
 void f_lang(arg_t args){
-	cout<<mes::lang;
+	ui.writeText(mes::lang);
 }
 ///Call the clean screen function
 void f_clear(arg_t args){
-	cls();
+	ui.cls();
 }
 ///Set running flag to 0, exit program
 void f_exit(arg_t args){
@@ -36,19 +78,19 @@ void f_exit(arg_t args){
 }
 //Errors
 ///Display error message for unknown command
-void f_wrongFunc(arg_t func){
-	cout<<mes::err_com[0]<<func[0]<<mes::err_com[1]<<endl;
+void f_wrongFunc(arg_t& func){
+	ui.writeText({mes::err_com[0], func[0], mes::err_com[1], "\n"});
 }
 ///Display error message for wrong arguments for function (or lack of them)
 void f_argError(arg_t data){
 	if(data.size()>1){
-		cout<<mes::err_arg[0];
+		ui.writeText(mes::err_arg[0]);
 		for(auto i = data.begin()+1; i<data.end(); i++)
-			cout<<*i<<" ";
-		cout<<mes::err_arg[1]<<data[0]<<mes::err_arg[4];
+			ui.writeText({*i, " "});
+		ui.writeText({mes::err_arg[1], data[0], mes::err_arg[4]});
 	}
 	else
-		cout<<mes::err_arg[2]<<data[0]<<mes::err_arg[3]<<mes::err_arg[4];
+		ui.writeText({mes::err_arg[2], data[0], mes::err_arg[3], mes::err_arg[4]});
 }
 // App functions
 ///Open sourcefile and import sets from it
@@ -57,21 +99,21 @@ void f_import(arg_t args){
 		sf = new sourcefile(args[1]);
 	}
 	else{
-		cout<<mes::import[0];
-		getline(cin, line);
+		ui.writeText(mes::import[0]);
+		line = ui.readLine();
 		trim(line);
 		sf = new sourcefile(line);
 	}
 
 	if(sf->read()){
-		cout<<mes::import[2]<<sf->path<<"\n";
+		ui.writeText({mes::import[2], sf->path, "\n"});
 		delete sf;
 		sf = nullptr;
 		return;
 	}
-	cout<<mes::import[1];
+	ui.writeText(mes::import[1]);
 	UIwait();
-	cls();
+	ui.cls();
 	return;
 }
 ///Train current sets
@@ -82,20 +124,20 @@ void f_train(arg_t args){
 	if(!sf)
 		return;
 
-	cout<<mes::start_sf[0]<<sf->path<<mes::start_sf[1];
+	ui.writeText({mes::start_sf[0], sf->path, mes::start_sf[1]});
 	for(int i=0; i<sf->sets.size(); i++)
-		cout<<i<<". "<<sf->sets[i].name<<"\n";
+		ui.writeText({to_string(i), ". ", sf->sets[i].name, "\n"});
 	UIwait();
 
 	for(set &s : sf->sets)
 		s.train(par::s);	//settings as parameter
-	cout<<mes::fin;
+	ui.writeText(mes::fin);
 
 	sf->update();	//dynamic updating of data?
 	if(sf->write())
-		cout<<mes::err_fnf<<sf->path<<"\n";
+		ui.writeText({mes::err_fnf, sf->path, "\n"});
 	UIwait();
-	cls();
+	ui.cls();
 }
 void f_settings(arg_t args){
 	if(args.size()<2){	//TODO ask user for specifying settings
@@ -112,8 +154,8 @@ map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i
 
 //Wait until user presses ENTER
 void UIwait(){
-	cout<<mes::wait;
-	getline(cin, line);
+	ui.writeText(mes::wait);
+	line = ui.readLine();
 }
 
 /*
@@ -133,17 +175,17 @@ int UIfunction(const vector<string> &args){
 
 ///Start UI loop
 void UIstart(){
-	cls();
-	cout<<mes::welcome;
+	ui.cls();
+	ui.writeText(mes::welcome);
 
 	flags |= 1;
 	cmd_t c;
 	while(flags & 1){
-		getline(cin, line);
+		line = ui.readLine();
 		trim(line);
 		if (line.size()>0)
 			UIfunction(split(line, " "));
 	}
 
-	cout<<mes::exit;
+	ui.writeText(mes::exit);
 }
