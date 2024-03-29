@@ -20,16 +20,17 @@ uint8_t parse(const std::vector<std::string> &args){
 					break;
 				case 'f':
 					par::flags[1]=1;
-					par::f=args[i+n];
+					par::f=(args.size()>i+n) ? args[i+n] : "";
 					n++;
+					break;
 				case 'l':
 					par::flags[2]=1;
-					par::l=args[i+n];
+					par::l=(args.size()>i+n) ? args[i+n] : "";
 					n++;
 					break;
 				case 's':
 					par::flags[3]=1;
-					par::s=stoi(args[i+n], nullptr, 2);
+					par::s=stoi(((args.size()>i+n) ? args[i+n] : "0"), nullptr, 2);
 					n++;
 					break;
 				case 'E':
