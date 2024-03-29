@@ -30,11 +30,31 @@ int32_t main(int argc, char *argv[]){
 
 	init();
 
-	//Temporary argument parsing
-	if (argc>1){
-		UIfunction(vector<string>(argv+1, argv+argc));	//Arguments sent to be interpreted as UI command
-	}
-	else
+	//STOP WHILE TRAINING
+
+	//HELP SHOULD CLS
+	/*
+	Parser file should have variables of set types - flags
+		Store boolean flags in bitset, varaibles are references to bits
+
+		1. [-E] <command>
+			start program and immidiately execute <command>
+			-E | --exit	exit program after command finishes execution
+		[-s <settings>]
+			set training settings
+		[-l <language code>]
+			set language
+		[-Tf <filepath>]
+			import file from <filepath> and train it
+	*/
+
+	parse({argv, argv+argc});
+		//UIfunction(vector<string>(argv+1, argv+argc));
+	if(par::flags[1])
+		UIfunction({"i", par::f});
+	if(par::flags[0])
+		UIfunction({"t"});
+	if(!par::flags[4])
 		UIstart();	//Start the UI loop
 
 	//Cleanup

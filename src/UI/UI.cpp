@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 typedef void (*cmd_t)(const vector<string>&);	//Funcion pointers to executed commands
 typedef const vector<string> &arg_t;		//Macro for command arguments
 
@@ -20,6 +19,7 @@ string line;	//Container for user input from std::cin
 // Program util functions
 ///Display help message
 void f_help(arg_t args){
+	cls();
 	cout<<mes::help;
 }
 ///Choose language (for now not working)
@@ -36,7 +36,7 @@ void f_exit(arg_t args){
 }
 //Errors
 ///Display error message for unknown command
-void f_wrongFunc(arg_t& func){
+void f_wrongFunc(arg_t func){
 	cout<<mes::err_com[0]<<func[0]<<mes::err_com[1]<<endl;
 }
 ///Display error message for wrong arguments for function (or lack of them)
@@ -88,7 +88,7 @@ void f_train(arg_t args){
 	UIwait();
 
 	for(set &s : sf->sets)
-		s.train(7);	//settings as parameter
+		s.train(par::s);	//settings as parameter
 	cout<<mes::fin;
 
 	sf->update();	//dynamic updating of data?
@@ -97,9 +97,18 @@ void f_train(arg_t args){
 	UIwait();
 	cls();
 }
+void f_settings(arg_t args){
+	if(args.size()<2){	//TODO ask user for specifying settings
+		f_argError({"s"});
+		return;
+	}
+	par::s = stoi(args[1], nullptr, 2);
+	cout<<"New settings: "<<0+par::s<<"\n";
+	return;
+}
 
 //Map assigning shortcuts to commands, used to interpret user input
-map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train}, {"c", f_clear} };
+map<string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"i", f_import}, {"t", f_train}, {"c", f_clear}, {"s", f_settings} };
 
 //Wait until user presses ENTER
 void UIwait(){
