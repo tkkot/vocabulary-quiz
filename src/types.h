@@ -24,7 +24,7 @@ struct ansgroup{
 //A single entry, or line in sourcefile - key and answer
 struct entry{
 	char state;
-	int lineNum;
+	int lineNum;	//deprecated
 	std::string key;
 	std::vector<ansgroup> ans;
 	const category* cat;
@@ -32,6 +32,8 @@ struct entry{
 	entry(int lineNum, const std::string &line, const category* cat, char state = 0);
 
 	bool check(const std::vector<std::string>& ans);
+
+	operator std::string() const;
 };
 
 //A set of entries grouped in categories

@@ -3,7 +3,7 @@
 #include <ctime>
 
 // #include <functions.h>
-#include <UI/consoleUI.h>
+#include <UI/console/consoleUI.h>
 
 //Platform-dependent functions
 #ifdef _WIN32
@@ -23,9 +23,7 @@
 #endif
 
 //Currently imported file
-sourcefile *sf;
-
-std::vector<set> setCache;
+// sourcefile *sf;
 
 
 /**
@@ -36,23 +34,25 @@ std::vector<set> setCache;
  *		
 */
 
-consoleUI test;
-UI &ui = test;
+UI *ui;
+
+
+
+
+//STOP WHILE TRAINING
+
+//HELP SHOULD CLS
+
+
 
 int32_t main(int argc, char *argv[]){
-
-	init();
-
-	//STOP WHILE TRAINING
-
-	//HELP SHOULD CLS
 	/*
 	Parser file should have variables of set types - flags
 		Store boolean flags in bitset, varaibles are references to bits
 
-		1. [-E] <command>
-			start program and immidiately execute <command>
-			-E | --exit	exit program after command finishes execution
+		1. [-X] <commands>
+			start program and immidiately execute <commands> in order
+			-E | --exit	exit program after all commands finish execution
 		[-s <settings>]
 			set training settings
 		[-l <language code>]
@@ -61,18 +61,33 @@ int32_t main(int argc, char *argv[]){
 			import file from <filepath> and train it
 	*/
 
-	parse({argv, argv+argc});
-		//UIfunction(vector<string>(argv+1, argv+argc));
-	if(par::flags[1])
-		UIfunction({"i", par::f});
-	if(par::flags[0])
-		UIfunction({"t"});
+	parse({argv, argv+argc});	//parse commandline arguments
+
+	init();
+	//cmdCommand(vector<string>(argv+1, argv+argc));
+	
+	//TODO: UI system selecting
+	ui= new consoleUI;
+	
+	ui->init();
+	getSetList();
+
+	// if(par::flags[1])
+	// 	ui->cmdCommand({"i", par::f});
+	// if(par::flags[0])
+	// 	ui->cmdCommand({"t"});
 	if(!par::flags[4])
-		UIstart();	//Start the UI loop
+		ui->start();	//Start the UI loop
 
 	//Cleanup
-	if (sf)
-		delete sf;
+
+	for(const std::pair<const std::string, set*> &i : loadedSets){
+		if(i.second)
+			delete i.second;
+	}
+
+	// if (sf)
+	// 	delete sf;
 
 	return 0;
 }
