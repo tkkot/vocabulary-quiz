@@ -89,15 +89,21 @@ uint8_t loadSet(const std::string &setname){
 	return 0;
 }
 
-uint8_t saveSet(const std::string &set){
+uint8_t saveSet(const set *s){
 
-
-
-	// if(loadableSets.insert(set).second){
-	// 	//update set list
-	// }
-
-	
+	getSetList();
+	if(loadableSets.insert(s->name).second){
+		std::ofstream fs(unwrapPath(data_location)+"/.setlist");
+		for(const std::string &i : loadableSets){
+			fs<<i<<'\n';
+		}
+		fs.close();
+	}
+	std::ofstream fs(unwrapPath(data_location)+"/"+s->name);
+	for(const entry &e : s->entries){
+		fs<<e<<'\n';
+	}
+	fs.close();
 	// for(const set i : sets){
 	// 	std::fstream fs(data_location+"/"+i.name);
 	// 	for(const entry j : i.entries){

@@ -3,6 +3,7 @@
 #define __MES_UI__
 #define __MES_CONSOLE_UI__
 #include <UI/messages.h>
+#include <stdexcept>
 
 #include "consoleUI.h"
 
@@ -75,6 +76,28 @@ void f_list(arg_t args){
         }
     }
 }
+void f_load(arg_t args){
+
+}
+void f_save(arg_t args){
+    set *s;
+    try{
+        if(args.size()<2){
+            ui->writeText("Which set to save?");
+            s = loadedSets.at(trim_c(ui->readLine()));
+        }
+        else
+            s = loadedSets.at(args[1]);
+    }
+    catch(std::out_of_range e){
+        ui->writeText("This set is not loaded\n");
+        goto _END;
+    }
+    saveSet(s);
+_END:
+    UIwait();
+    ui->cls();
+}
 ///Open sourcefile and import sets from it
 void f_import(arg_t args){
     std::string path;
@@ -101,7 +124,24 @@ void f_import(arg_t args){
 }
 ///Train current sets
 void f_train(arg_t args){
-    ui->writeText("TRAINING TEMPORARILY NOT WORKING\n");
+    // ui->writeText("TRAINING TEMPORARILY NOT WORKING\n");
+
+    set *s;
+    try{
+        if(args.size()<2){
+            ui->writeText("Which set to train?");
+            s = loadedSets.at(trim_c(ui->readLine()));
+        }
+        else
+            s = loadedSets.at(args[1]);
+    }
+    catch(std::out_of_range e){
+        ui->writeText("This set is not loaded\n");
+        goto _END;
+    }
+
+    s->train(par::s); 
+
 	// if (!sf | args.size()>1)
 	// 	f_import(args);
 	// if(!sf)
@@ -119,6 +159,7 @@ void f_train(arg_t args){
 	// sf->update();	//dynamic updating of data?
 	// if(sf->write())
 	// 	ui->writeText({mes::err_fnf, sf->path, "\n"});
+_END:
 	UIwait();
 	ui->cls();
 }
@@ -133,7 +174,9 @@ void f_settings(arg_t args){
 }
 
 //Map assigning shortcuts to commands, used to interpret user input
-std::map<std::string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, {"ls", f_list}, {"i", f_import}, {"t", f_train}, {"c", f_clear}, {"s", f_settings} };
+std::map<std::string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, 
+    {"ls", f_list}, {"ld", f_load}, {"s", f_save}, {"i", f_import}, {"t", f_train}, {"c", f_clear}, 
+    {"st", f_settings} };
 
 
 /*

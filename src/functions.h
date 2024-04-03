@@ -52,7 +52,7 @@ uint8_t getSetList();
 uint8_t getSetList(const std::string &location);
 
 uint8_t loadSet(const std::string &setname);
-uint8_t saveSet(const std::string &setname);
+uint8_t saveSet(const set *set);
 
 uint8_t importSets(const std::string &path);
 
