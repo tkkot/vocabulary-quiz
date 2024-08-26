@@ -4,6 +4,7 @@
 #define __MES_CONSOLE_UI__
 #include <UI/messages.h>
 #include <stdexcept>
+#include <algorithm>
 
 #include "consoleUI.h"
 
@@ -48,52 +49,122 @@ void f_argError(arg_t data){
 		ui->writeText({mes::err_arg[2], data[0], mes::err_arg[3], mes::err_arg[4]});
 }
 // App functions
+void f_reload(arg_t args){
+	ui->writeText("Reloading sets and dictionaries...\n");
+	reloadData();
+}
 void f_list(arg_t args){
     ui->cls();
-    if(args.size()>1){
-        if(loadedSets.find(args[1])==loadedSets.end())
-            ui->writeText("Set "+args[1]+" not loaded");
-        else{
-            for(const entry &i : loadedSets[args[1]]->entries){
-                ui->writeText({i,"\n"});
-            }
-        }
-    }
-    else{
-        ui->writeText("Available sets:\n");
 
-        if (getSetList()){
-            ui->writeText("Error loading set list\n");
-            return;
-        }
-        for(const std::string& i : loadableSets){
-            ui->writeText(i+"\n");
-        }
+	///MOVE TO DIFFERENT FUNCTION
+    // if(args.size()>1){
+	// 	int n;
+	// 	try{
+	// 		n=std::stoi(args[1]);
+	// 		if(n>=sets.size()){
+	// 			(*ui)<<"Number out of range";
+	// 			return;
+	// 		}
+	// 	}
+	// 	catch(std::invalid_argument){
+	// 		n=std::distance(sets.begin(), std::find_if(sets.begin(), sets.end(), [&](const set* const s){
+	// 			return s->name==args[1];
+	// 		}));
+	// 		if(n==sets.size()){
+	// 			ui->writeText("Set "+args[1]+" not loaded");
+	// 			return;
+	// 		}
+	// 	}
 
-        ui->writeText("\nCurrently loaded sets:\n");
-        for(const std::pair<const std::string, set*> &i : loadedSets){
-            ui->writeText(i.first+"\n");
-        }
-    }
+	// 	for(const set::entry &i : sets[n]->entries){
+	// 		ui->writeText({i,"\n"});
+    //     }
+    // }
+    // else{
+
+	ui->writeText("Available dictionaries:\n");
+	for(int i=0; i<dList.size(); i++){
+		(*ui)<<std::to_string(i)<<". "<<dList[i]<<"\n";
+	}
+
+	ui->writeText("Currently loaded dictionaries:\n");
+	for(int i=0; i<dictionaries.size(); i++){
+		(*ui)<<std::to_string(i)<<". "<<dictionaries[i]->name<<"\n";
+	}
+
+	ui->writeText("Available sets:\n");
+	for(int i=0; i<sList.size(); i++){
+		(*ui)<<std::to_string(i)<<". "<<sList[i]<<"\n";
+	}
+
+	ui->writeText("Currently loaded sets:\n");
+	for(int i=0; i<sets.size(); i++){
+		(*ui)<<std::to_string(i)<<". "<<sets[i]->name<<"\n";
+	}
+    // }
 }
 void f_load(arg_t args){
 
 }
 void f_save(arg_t args){
-    set *s;
-    try{
-        if(args.size()<2){
-            ui->writeText("Which set to save?");
-            s = loadedSets.at(trim_c(ui->readLine()));
-        }
-        else
-            s = loadedSets.at(args[1]);
-    }
-    catch(std::out_of_range e){
-        ui->writeText("This set is not loaded\n");
-        goto _END;
-    }
-    saveSet(s);
+	std::string l = (
+		(args.size()>1)	?		//I'm sorry. Was just curious whether this would work.
+		args[1]			:		//I love the ternary operator.
+		[](){					//And lambdas no longer scare me.
+			(*ui)<<"Which set to save?";
+			return trim_c(ui->readLine());
+		}()
+	);
+
+	int n;
+	try{
+		n=std::stoi(l);
+		if(n>=sets.size()){
+			(*ui)<<"Number out of range";
+			goto _END;
+		}
+	}
+	catch(std::invalid_argument){
+		n=std::distance(sList.begin(), std::find(sList.begin(), sList.end(), l));
+		if(n==sList.size()){
+			(*ui)<<("Set "+l+" not loaded");
+			goto _END;
+		}
+	}
+    saveSet(sets.at(n));
+	
+	// //DO NOT EVEN ASK.
+	// try{
+	// 	saveSet(sets.at(
+	// 		[&](){
+	// 			try{
+	// 				int n = std::stoi(l);
+	// 				return (
+	// 					(n>=sets.size())	?
+	// 					[](){
+	// 						(*ui)<<"Number out of range";
+	// 						return -1;
+	// 					}()					:
+	// 					n
+	// 				);
+	// 			}
+	// 			catch(std::invalid_argument){
+	// 				int n = std::distance(sList.begin(), std::find(sList.begin(), sList.end(), l));
+	// 				return (
+	// 					(n==sList.size())	?
+	// 					[&](){
+	// 						(*ui)<<"Set "+l+" not loaded";
+	// 						return -1;
+	// 					}()					:
+	// 					n
+	// 				);
+	// 			}
+	// 		}()
+	// 	));
+	// }
+	// catch(std::out_of_range){}
+	// //... yes. it does work. (compile. could not bother to test further)
+
 _END:
     UIwait();
     ui->cls();
@@ -125,22 +196,32 @@ void f_import(arg_t args){
 ///Train current sets
 void f_train(arg_t args){
     // ui->writeText("TRAINING TEMPORARILY NOT WORKING\n");
+	std::string l = (
+		(args.size()>1)	?		//I'm sorry. Was just curious whether this would work.
+		args[1]			:		//I love the ternary operator.
+		[](){					//And lambdas no longer scare me.
+			(*ui)<<"Which set to train?";
+			return trim_c(ui->readLine());
+		}()
+	);
 
-    set *s;
-    try{
-        if(args.size()<2){
-            ui->writeText("Which set to train?");
-            s = loadedSets.at(trim_c(ui->readLine()));
-        }
-        else
-            s = loadedSets.at(args[1]);
-    }
-    catch(std::out_of_range e){
-        ui->writeText("This set is not loaded\n");
-        goto _END;
-    }
+	int n;
+	try{
+		n=std::stoi(l);
+		if(n>=sets.size()){
+			(*ui)<<"Number out of range";
+			goto _END;
+		}
+	}
+	catch(std::invalid_argument){
+		n=std::distance(sList.begin(), std::find(sList.begin(), sList.end(), l));
+		if(n==sList.size()){
+			(*ui)<<("Set "+l+" not loaded");
+			goto _END;
+		}
+	}
 
-    s->train(par::s); 
+    sets.at(n)->train(par::s); 
 
 	// if (!sf | args.size()>1)
 	// 	f_import(args);
@@ -174,9 +255,9 @@ void f_settings(arg_t args){
 }
 
 //Map assigning shortcuts to commands, used to interpret user input
-std::map<std::string, cmd_t> COMMANDS = { {"h", f_help}, {"l", f_lang}, {"q", f_exit}, 
-    {"ls", f_list}, {"ld", f_load}, {"s", f_save}, {"i", f_import}, {"t", f_train}, {"c", f_clear}, 
-    {"st", f_settings} };
+std::map<std::string, cmd_t> COMMANDS = { {"h", f_help}, {"lang", f_lang}, {"q", f_exit}, 
+    {"r", f_reload}, {"l", f_list}, {"ld", f_load}, {"s", f_save}, {"i", f_import}, {"t", f_train},
+	{"c", f_clear}, {"st", f_settings} };
 
 
 /*

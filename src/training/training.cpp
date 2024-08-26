@@ -13,7 +13,7 @@
 
 //Defining functions declared in "types.h" and "functions.h"
 
-ansgroup::operator std::string(){
+set::ansgroup::operator std::string(){
 	std::string s;
 	if(type == '*')
 		s+='*';
@@ -33,7 +33,7 @@ ansgroup::operator std::string(){
  * cat - entry's category
  * state - state to set for entry (read from sourcefile)
  */
-entry::entry(int lineNum, const std::string &line, const category* cat, char state):
+set::entry::entry(int lineNum, const std::string &line, const category* cat, char state):
 	lineNum(lineNum), cat(cat), state(state){
 
 	std::vector<std::string> s = split(line, ";");	//Split line into two halves by ';' separator
@@ -73,7 +73,7 @@ entry::entry(int lineNum, const std::string &line, const category* cat, char sta
  * Answer string should contain every mandatory (default) answer and no wrong (not matching) answers
  * 
  */
-bool entry::check(const std::vector<std::string>& ans){
+bool set::entry::check(const std::vector<std::string>& ans){
 	bool c1 = 0, c2;
 	int c=0;	//counts how many strings in ans match a correct answer in the entry
 	for(ansgroup& i : this->ans){
@@ -97,7 +97,7 @@ bool entry::check(const std::vector<std::string>& ans){
 	return c1;
 }
 
-entry::operator std::string() const{
+set::entry::operator std::string() const{
 	std::string s=std::to_string(this->lineNum)+' '+this->cat->name+": "+this->key+"; ";
 	for(ansgroup i : this->ans)
 		s+=(std::string)i;
@@ -111,7 +111,7 @@ set::set(std::string name) : name(name) {
 	categories["default"] = {0, "default"};
 }
 
-bool processEntry(entry& e, std::queue<entry*> &wrng, std::string &name){
+bool processEntry(set::entry& e, std::queue<set::entry*> &wrng, std::string &name){
 	std::string line;
 	if(e.state == '^')
 		return 0;
@@ -132,7 +132,7 @@ bool processEntry(entry& e, std::queue<entry*> &wrng, std::string &name){
 	
 	//Respond to user
 	ui->writeText((cr ? mes::cor : mes::inc));
-	for(ansgroup i : e.ans){
+	for(set::ansgroup i : e.ans){
 		ui->writeText(i);
 	}
 	ui->writeText("\n");
@@ -331,7 +331,7 @@ uint8_t sourcefile::read(){
  */
 void sourcefile::update(){
 	for(const set& set : this->sets){
-		for(const entry& e : set.entries){
+		for(const set::entry& e : set.entries){
 			if(lines[e.lineNum][0] != e.state && e.state>0)
 				lines[e.lineNum] = e.state + lines[e.lineNum];
 		}

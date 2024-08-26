@@ -4,14 +4,14 @@ namespace mes{
 #define _V const std::vector<std::string>
 
 #ifdef __MES_UI__
-	_S welcome = "Welcome to the vocabulary training app thingy (that currently posesses no proper name).\nEnter 'h' for help menu or 'l' to change language\n";
+	_S welcome = "Welcome to the vocabulary training app thingy (that currently posesses no proper name).\nEnter 'h' for help menu or 'lang' to change language\n";
 
 	_S wait = "Press ENTER to continue...";
 
 	//Help messages
 	_S help = std::string("Currently supported commands:\n")+
 			"h\t	display this menu\n"+
-			"l\t	change language (currently unsupported)\n"+
+			"lang\t	change language (currently unsupported)\n"+
 			"q\t	exit program\n"+
 			"c\t	clear screen\n"+
 			"i\t	import new set from source file\n"+

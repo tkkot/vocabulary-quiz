@@ -70,8 +70,10 @@ int32_t main(int argc, char *argv[]){
 	ui= new consoleUI;
 	
 	ui->init();
-	getSetList();
-
+	// getSetList();
+	reloadData();
+	std::cout<<(char)0x1e<<"\n";
+	std::cout<<"\n";
 	// if(par::flags[1])
 	// 	ui->cmdCommand({"i", par::f});
 	// if(par::flags[0])
@@ -81,9 +83,9 @@ int32_t main(int argc, char *argv[]){
 
 	//Cleanup
 
-	for(const std::pair<const std::string, set*> &i : loadedSets){
-		if(i.second)
-			delete i.second;
+	for(set* i : sets){
+		if(i)
+			delete i;
 	}
 
 	// if (sf)

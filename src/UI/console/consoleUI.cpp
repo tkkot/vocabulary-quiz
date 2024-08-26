@@ -30,8 +30,8 @@
 #else
 	//Cleaning terminal (Also  from internet)
 	void consoleUI::cls(){
-		std::cout << "\033[2J\033[1;1H";
-		std::cout << "=============================" << "\n\n";
+		// std::cout << "\033[2J\033[1;1H";
+		// std::cout << "=============================" << "\n\n";
 	}
 #endif
 
@@ -55,7 +55,7 @@ void consoleUI::start(){
 		if (line.size()>0)
 			this->consoleCommand(split(line, " "));
 	}
-
+	UI& (*function_pointer)(const std::string&);
 	this->writeText(mes::exit);
 }
 void consoleUI::writeText(const std::string &text){
@@ -68,6 +68,7 @@ void consoleUI::writeText(std::initializer_list<std::string> text){
 }
 UI& consoleUI::operator<<(const std::string &text){
 	this->writeText(text);
+	// this->writeText("\n");
     return *this;
 }
 std::string consoleUI::readLine(){

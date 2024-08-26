@@ -4,11 +4,9 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;	//Must be included AFTER windows.h, or it messes up (conflict between std::byte and definition of byte in header)
-
 ///Outputting vectors with stream
 template<typename T>
-ostream& operator<<(ostream& stream, const vector<T>& vect){
+std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vect){
 	for(const T& i : vect){
 		stream<<i;
 		stream<<", ";
@@ -17,7 +15,7 @@ ostream& operator<<(ostream& stream, const vector<T>& vect){
 }
 
 //Remove whitespaces from beginning and end of string s
-void trim(string &s){
+void trim(std::string &s){
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
         return !std::isspace(ch);
     }));
@@ -26,21 +24,21 @@ void trim(string &s){
     }).base(), s.end());
 }
 //Same as trim, but copies string rather than referencing
-string trim_c(string s){
+std::string trim_c(std::string s){
 	trim(s);
 	return s;
 }
 
 //Checks if string starts with prefix
-bool startsWith(const string& s, const string& prefix){
+bool startsWith(const std::string& s, const std::string& prefix){
 	return prefix == s.substr(0, prefix.size());
 }
 
 //Split string into vector of strings by c
-vector<string> split(string s, const string& c){
+std::vector<std::string> split(std::string s, const std::string& c){
 	int i=0;
-	vector<string> v;
-	while( (i = s.find(c)) != string::npos){
+	std::vector<std::string> v;
+	while( (i = s.find(c)) != std::string::npos){
 		v.push_back(s.substr(0, i));
 		s.erase(0, i + c.size());
 	}
@@ -60,9 +58,9 @@ vector<string> split(string s, const string& c){
 // 	return stream;
 // }
 //For streaming entries
-ostream& operator<<(ostream& stream, const entry& e){
+std::ostream& operator<<(std::ostream& stream, const set::entry& e){
 	stream<<e.lineNum<<' '<<e.cat->name<<": "<<e.key<<"; ";
-	for(ansgroup i : e.ans)
-		stream<<(string)i;
+	for(set::ansgroup i : e.ans)
+		stream<<(std::string)i;
 	return stream;
 }

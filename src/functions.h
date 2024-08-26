@@ -17,7 +17,8 @@ public:
    virtual void start()=0;
    virtual void writeText(const std::string& text)=0;
    virtual void writeText(std::initializer_list<std::string> text)=0;
-   //As opposed to writeText(), which should just write given text in active location, this function's behaviour may differ depending on what the program currently is doing.
+   //TO IMPLEMENT!
+   //As opposed to writeText(), which should just write given text in active location, this function's behaviour should differ depending on what the program currently is doing.
    virtual UI& operator<<(const std::string &test)=0;
    virtual std::string readLine()=0;
    virtual void cls()=0;   //clear screen
@@ -45,13 +46,21 @@ extern std::string f;
 
 
 //-----------data management---------------
-extern std::map<const std::string, set*> loadedSets;
-extern std::set<std::string> loadableSets;
+extern std::vector<std::string> dList, sList;
 
-uint8_t getSetList();
-uint8_t getSetList(const std::string &location);
+extern std::vector<dictionary*> dictionaries;
+extern std::vector<set*> sets;
 
-uint8_t loadSet(const std::string &setname);
+// extern std::map<const std::string, set*> loadedSets;
+// extern std::set<std::string> loadableSets;
+
+// uint8_t getSetList();
+// uint8_t getSetList(const std::string &location);
+uint8_t reloadData();
+uint8_t reloadData(const std::string &location);
+
+uint8_t loadDictionary(int id);
+uint8_t loadSet(int id);
 uint8_t saveSet(const set *set);
 
 uint8_t importSets(const std::string &path);
@@ -64,6 +73,6 @@ bool startsWith(const std::string& s, const std::string& prefix);
 std::vector<std::string> split(std::string s, const std::string& c);
 
 //Output - streaming containers and structs
-std::ostream& operator<<(std::ostream& stream, const entry& e);
+std::ostream& operator<<(std::ostream& stream, const set::entry& e);
 template<typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vect);

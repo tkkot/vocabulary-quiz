@@ -8,37 +8,59 @@
 
 //Training types
 
-//User-defined entry category
-struct category{
-	int num;
+struct dictionary{
+	std::string id;
 	std::string name;
+	std::string ver;
+	std::string desc;
+	struct entry{
+		std::string id;
+		std::vector<std::string> alts;
+		//TODO: INFLECTIONS
+		std::vector<std::string> defs;
+		// entry(std::string &id, std::string &inf, std::string &def);
+	};
+	std::map<std::string, entry> entries;
+	dictionary(const std::string &id);
 };
 
-//One set of answers, mutually alternative
-struct ansgroup{
-	uint8_t type;	// 0 - mandatory, '*' - not-mandatory, '-' - ending
-	std::vector<std::string> ans;
-	operator std::string();
-};
 
-//A single entry, or line in sourcefile - key and answer
-struct entry{
-	char state;
-	int lineNum;	//deprecated
-	std::string key;
-	std::vector<ansgroup> ans;
-	const category* cat;
-
-	entry(int lineNum, const std::string &line, const category* cat, char state = 0);
-
-	bool check(const std::vector<std::string>& ans);
-
-	operator std::string() const;
-};
 
 //A set of entries grouped in categories
 class set{
 public:
+
+	//User-defined entry category
+	struct category{
+		int num;
+		std::string name;
+	};
+
+	//One set of answers, mutually alternative
+	struct ansgroup{
+		uint8_t type;	// 0 - mandatory, '*' - not-mandatory, '-' - ending
+		std::vector<std::string> ans;
+		operator std::string();
+	};
+
+	//A single entry, or line in sourcefile - key and answer
+	struct entry{
+		dictionary::entry e;
+
+
+		char state;
+		int lineNum;	//deprecated
+		std::string key;
+		std::vector<ansgroup> ans;
+		const category* cat;
+
+		entry(int lineNum, const std::string &line, const category* cat, char state = 0);
+
+		bool check(const std::vector<std::string>& ans);
+
+		operator std::string() const;
+	};
+
 	std::string name;
 	std::vector<entry> entries;
 	int activeEntries;
